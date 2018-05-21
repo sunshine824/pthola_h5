@@ -36,54 +36,68 @@
         </div>
       </div>
     </div>
+    <div class="lists" :style="{height: 1.281 * time + 'rem'}">
+      <div class="time">
+        <div class="tip" v-for="(item,index) in time">
+          <span class="num">{{String(index).length > 1 ? String(index) : 0+String(index)}}</span>
+          <span class="txt">:00</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
   export default {
-    name: "book-list"
+    name: "book-list",
+    data() {
+      return {
+        time: 24
+      }
+    }
   }
 </script>
 
 <style scoped lang="less">
-  .book{
+  .book {
     position: relative;
     width: 100%;
     display: flex;
     display: -webkit-flex;
     flex-flow: column nowrap;
-    .top-list{
+    .top-list {
       display: flex;
       display: -webkit-flex;
       flex-flow: row nowrap;
       align-items: center;
       height: 1.6rem;
-      position: absolute;
+      position: fixed;
+      z-index: 20;
       top: 0;
       background: #4b4b4b;
       width: 100%;
-      .date{
+      .date {
         display: flex;
         display: -webkit-flex;
         flex-flow: column nowrap;
         color: #fff;
         font-size: .35rem;
         height: 100%;
-        width: 12.5%;
+        width: 1rem;
         justify-content: center;
         align-items: center;
-        .year{
+        .year {
           margin-bottom: .1rem;
           padding: .1rem;
         }
       }
-      .menu{
+      .menu {
         display: flex;
         display: -webkit-flex;
         flex-flow: row nowrap;
         height: 100%;
         flex: 1;
-        .tip{
+        .tip {
           display: flex;
           display: -webkit-flex;
           flex-flow: column nowrap;
@@ -91,15 +105,42 @@
           justify-content: center;
           font-size: .35rem;
           color: #fff;
-          width: 14.2857143%;
+          width: 1.281rem;
           height: 100%;
-          .day{
+          .day {
             margin-bottom: .1rem;
             padding: .1rem;
-            &.today{
+            &.today {
               background: #888787;
               border-radius: 50%;
             }
+          }
+        }
+      }
+    }
+    .lists {
+      position: absolute;
+      z-index: 15;
+      background: #fff;
+      width: 100%;
+      display: flex;
+      display: -webkit-flex;
+      flex-flow: row nowrap;
+      top: 1.6rem;
+      .time{
+        width: 1rem;
+        height: 100%;
+        border-right: 1px solid #d9d9d9;
+        .tip{
+          width: 100%;
+          height: 1.281rem;
+          display: flex;
+          display: -webkit-flex;
+          align-items: baseline;
+          justify-content: center;
+          flex-flow: row nowrap;
+          .txt{
+            font-size: .3rem;
           }
         }
       }
