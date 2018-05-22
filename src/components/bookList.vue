@@ -151,7 +151,7 @@
       //判断是否点击中间部分
       _isClickCenter(offsetY){
         const that = this
-        for(let i=0; i<that.crossLines.length - 1; i++){
+        for(let i=0; i<that.crossLines.length; i++){
           let height1 = that.crossLines[i]
           let height2 = that.crossLines[i+1]
           if(offsetY >= height1 && offsetY < height2){
