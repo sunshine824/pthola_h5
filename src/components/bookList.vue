@@ -36,6 +36,7 @@
            :style="{left:sizeRem * index + 'rem'}">
         </p>
         <p class="cross-line"
+           ref="crossLines"
            v-for="(item,index) in crossLine"
            :style="{top:sizeRem * index + 'rem'}">
         </p>
@@ -78,6 +79,7 @@
           y: 0
         },  //点击位置
         btns: [],
+        crossLines: []
       }
     },
     created() {
@@ -86,6 +88,8 @@
     mounted() {
       //获取计算后的格子像素
       this.sizePx = this.$refs.sizeItem[0].clientWidth
+      //计算每条横线距离顶部高度
+      this._listCrossLinesHeight()
     },
     methods: {
       getCalendarDate() {
@@ -108,15 +112,57 @@
           return
         }
         let [offsetX, offsetY, sizePx, that] = [e.offsetX, e.offsetY, this.sizePx, this]
+
         this.offset = {
           x: Math.ceil(offsetX / sizePx),
           y: Math.ceil(offsetY / sizePx)
         }
-        console.log(this.offset.x, this.offset.y)
         this.btns.push({
-          left:(that.offset.x - 1) * that.sizeRem + 0.057 + 'rem',
-          top:(that.offset.y - 1) * that.sizeRem + 0.049 + 'rem'
+          left: (that.offset.x - 1) * that.sizeRem + 0.057 + 'rem',
+          top: (that.offset.y - 1) * that.sizeRem + 0.049 + 'rem'
         })
+        //判断是否点击中间部分
+        console.log(this._isClickCenter(offsetY))
+      },
+      //周末样式
+      _barStyle() {
+        const that = this
+        this.weeks.map((v, i) => {
+          if (v == 6) {
+            that.barStyle.sixBar = {
+              left: i * that.sizeRem + 'rem',
+              width: that.sizeRem + 'rem'
+            }
+          } else if (v == 0) {
+            that.barStyle.zeroBar = {
+              left: i * that.sizeRem + 'rem',
+              width: that.sizeRem + 'rem'
+            }
+          }
+        })
+      },
+      //计算每条横线距离顶部高度
+      _listCrossLinesHeight(){
+        const crossLines = this.$refs.crossLines
+        for(let i = 0; i<crossLines.length; i++){
+          this.crossLines.push(crossLines[i].offsetTop)
+        }
+      },
+      //判断是否点击中间部分
+      _isClickCenter(offsetY){
+        const that = this
+        for(let i=0; i<that.crossLines.length - 1; i++){
+          let height1 = that.crossLines[i]
+          let height2 = that.crossLines[i+1]
+          if(offsetY >= height1 && offsetY < height2){
+            const diff = Math.abs(height2 - offsetY) > Math.abs(height1 - offsetY) ? Math.abs(height1 - offsetY) : Math.abs(height2 - offsetY)
+            if(diff < 10){
+              return true
+            }else {
+              return false
+            }
+          }
+        }
       },
       _chinaWeek(num) {
         let week = ''
@@ -145,22 +191,6 @@
         }
         return week
       },
-      _barStyle() {
-        const that = this
-        this.weeks.map((v, i) => {
-          if (v == 6) {
-            that.barStyle.sixBar = {
-              left: i * that.sizeRem + 'rem',
-              width: that.sizeRem + 'rem'
-            }
-          } else if (v == 0) {
-            that.barStyle.zeroBar = {
-              left: i * that.sizeRem + 'rem',
-              width: that.sizeRem + 'rem'
-            }
-          }
-        })
-      }
     }
   }
 </script>
