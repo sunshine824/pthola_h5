@@ -1,18 +1,19 @@
 <template>
   <div class="book clearfix">
     <div class="top-list">
-      <div class="date">
+      <div class="date" ref="sizeDate">
         <span class="year">{{date.year}}</span>
         <span class="month">{{date.month}}月</span>
       </div>
       <div class="menu">
-        <div class="tip" :class="{active:item.week==='日' || item.week==='六'}" v-for="(item,index) in calendarDate">
+        <div class="tip" ref="sizeItem" :class="{active:item.week==='日' || item.week==='六'}"
+             v-for="(item,index) in calendarDate">
           <span class="day" :class="{today:item.isToDay}">{{item.day}}</span>
           <span class="week">周{{item.week}}</span>
         </div>
       </div>
     </div>
-    <div class="lists" :style="{height: size * time + 'rem'}">
+    <div class="lists" :style="{height: sizeRem * time + 'rem'}">
       <!--左侧时间段-->
       <div class="time">
         <div class="tip" v-for="(item,index) in time">
@@ -27,17 +28,18 @@
         </p>
       </div>
       <!--右侧排课列表-->
-      <div class="calendar">
+      <div class="calendar" @click="onTap($event)">
         <!--<p class="six-bar" :style="barStyle.sixBar"></p>-->
         <!--<p class="zero-bar" :style="barStyle.zeroBar"></p>-->
         <p class="ver-line"
            v-for="(item,index) in verLine"
-           :style="{left:size * index + 'rem'}">
+           :style="{left:sizeRem * index + 'rem'}">
         </p>
         <p class="cross-line"
            v-for="(item,index) in crossLine"
-           :style="{top:size * index + 'rem'}">
+           :style="{top:sizeRem * index + 'rem'}">
         </p>
+        <p class="btn" v-for="(item,index) in btns" :style="item">已约</p>
       </div>
     </div>
   </div>
@@ -50,30 +52,40 @@
     name: "book-list",
     data() {
       return {
-        size:1.281,
-        time: 24,
-        verLine: 7,
-        crossLine: 24,
+        sizeRem: 1.281,  //每个格子rem
+        sizePx: 0,  //每个格子计算后的px
+        time: 24,  //24小时
+        verLine: 7,  //7条竖线
+        crossLine: 24,  //24条横线
         date: {
           year: moment().format('YYYY'),
           month: moment().format('MM')
-        },
-        calendarDate: [],
-        weeks:[],
-        barStyle:{
-          sixBar:{
-            left:0,
-            width:0
+        },  //当前年月
+        calendarDate: [],  //未来七天日期
+        weeks: [],
+        barStyle: {
+          sixBar: {
+            left: 0,
+            width: 0
           },
-          zeroBar:{
-            left:0,
-            width:0
+          zeroBar: {
+            left: 0,
+            width: 0
           }
         }, //周末颜色条
+        offset: {
+          x: 0,
+          y: 0
+        },  //点击位置
+        btns: [],
       }
     },
     created() {
       this.getCalendarDate()
+    },
+    mounted() {
+      //获取计算后的格子像素
+      this.sizePx = this.$refs.sizeItem[0].clientWidth
     },
     methods: {
       getCalendarDate() {
@@ -84,11 +96,27 @@
           this.calendarDate.push({
             day: moment().add(i, 'days').format('DD'),
             week: that._chinaWeek(moment().add(i, 'days').format('d')),
-            isToDay:now.getDay() == moment().add(i, 'days').format('d')
+            isToDay: now.getDay() == moment().add(i, 'days').format('d')
           })
           this.weeks.push(moment().add(i, 'days').format('d'))
         }
         that._barStyle()
+      },
+      //获取点击位置
+      onTap(e) {
+        if (e.target.className !== 'calendar') {
+          return
+        }
+        let [offsetX, offsetY, sizePx, that] = [e.offsetX, e.offsetY, this.sizePx, this]
+        this.offset = {
+          x: Math.ceil(offsetX / sizePx),
+          y: Math.ceil(offsetY / sizePx)
+        }
+        console.log(this.offset.x, this.offset.y)
+        this.btns.push({
+          left:(that.offset.x - 1) * that.sizeRem + 0.057 + 'rem',
+          top:(that.offset.y - 1) * that.sizeRem + 0.049 + 'rem'
+        })
       },
       _chinaWeek(num) {
         let week = ''
@@ -117,18 +145,18 @@
         }
         return week
       },
-      _barStyle(){
+      _barStyle() {
         const that = this
-        this.weeks.map((v,i)=>{
-          if(v == 6){
+        this.weeks.map((v, i) => {
+          if (v == 6) {
             that.barStyle.sixBar = {
-              left:i * that.size + 'rem',
-              width:that.size + 'rem'
+              left: i * that.sizeRem + 'rem',
+              width: that.sizeRem + 'rem'
             }
-          }else if(v == 0){
+          } else if (v == 0) {
             that.barStyle.zeroBar = {
-              left:i * that.size + 'rem',
-              width:that.size + 'rem'
+              left: i * that.sizeRem + 'rem',
+              width: that.sizeRem + 'rem'
             }
           }
         })
@@ -194,7 +222,7 @@
               border-radius: 50%;
             }
           }
-          &.active{
+          &.active {
             color: #ec7822;
           }
         }
@@ -231,7 +259,7 @@
             align-items: baseline;
             justify-content: center;
           }
-          .num{
+          .num {
             font-size: .35rem;
           }
           .txt {
@@ -250,7 +278,7 @@
           justify-content: center;
           position: absolute;
           left: .12rem;
-          .num{
+          .num {
             font-size: .35rem;
           }
           .txt {
@@ -265,7 +293,7 @@
         flex: 1;
         background-color: #f7f7f7;
         z-index: 8;
-        .six-bar,.zero-bar{
+        .six-bar, .zero-bar {
           background: #fff;
           height: 100%;
           position: absolute;
@@ -285,6 +313,22 @@
           width: 100%;
           border-top: 1px solid #d9d9d9;
           z-index: 15;
+        }
+        .btn {
+          position: absolute;
+          left: 0;
+          top: 0;
+          border-radius: 6px;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          background: linear-gradient(to bottom, #10c6ff, #0b9cd8);
+          width: 1.18rem;
+          height: 1.18rem;
+          flex-flow: column nowrap;
+          text-align: center;
+          line-height: 1.18rem;
+          font-size: .32rem;
         }
       }
     }
