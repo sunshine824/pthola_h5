@@ -6,13 +6,13 @@
         <span class="month">{{date.month}}月</span>
       </div>
       <div class="menu">
-        <div class="tip" v-for="(item,index) in calendarDate">
+        <div class="tip" :class="{active:item.week==='日' || item.week==='六'}" v-for="(item,index) in calendarDate">
           <span class="day" :class="{today:item.isToDay}">{{item.day}}</span>
           <span class="week">周{{item.week}}</span>
         </div>
       </div>
     </div>
-    <div class="lists" :style="{height: 1.281 * time + 'rem'}">
+    <div class="lists" :style="{height: size * time + 'rem'}">
       <!--左侧时间段-->
       <div class="time">
         <div class="tip" v-for="(item,index) in time">
@@ -28,15 +28,15 @@
       </div>
       <!--右侧排课列表-->
       <div class="calendar">
-        <p class="six-bar" :style="barStyle.sixBar"></p>
-        <p class="zero-bar" :style="barStyle.zeroBar"></p>
+        <!--<p class="six-bar" :style="barStyle.sixBar"></p>-->
+        <!--<p class="zero-bar" :style="barStyle.zeroBar"></p>-->
         <p class="ver-line"
            v-for="(item,index) in verLine"
-           :style="{left:1.281 * index + 'rem'}">
+           :style="{left:size * index + 'rem'}">
         </p>
         <p class="cross-line"
            v-for="(item,index) in crossLine"
-           :style="{top:1.281 * index + 'rem'}">
+           :style="{top:size * index + 'rem'}">
         </p>
       </div>
     </div>
@@ -50,6 +50,7 @@
     name: "book-list",
     data() {
       return {
+        size:1.281,
         time: 24,
         verLine: 7,
         crossLine: 24,
@@ -68,7 +69,7 @@
             left:0,
             width:0
           }
-        }
+        }, //周末颜色条
       }
     },
     created() {
@@ -121,13 +122,13 @@
         this.weeks.map((v,i)=>{
           if(v == 6){
             that.barStyle.sixBar = {
-              left:i * 1.281 + 'rem',
-              width:1.281 + 'rem'
+              left:i * that.size + 'rem',
+              width:that.size + 'rem'
             }
           }else if(v == 0){
             that.barStyle.zeroBar = {
-              left:i * 1.281 + 'rem',
-              width:1.281 + 'rem'
+              left:i * that.size + 'rem',
+              width:that.size + 'rem'
             }
           }
         })
@@ -192,6 +193,9 @@
               background: #888787;
               border-radius: 50%;
             }
+          }
+          &.active{
+            color: #ec7822;
           }
         }
       }
