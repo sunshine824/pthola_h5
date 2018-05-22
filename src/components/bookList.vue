@@ -28,6 +28,8 @@
       </div>
       <!--右侧排课列表-->
       <div class="calendar">
+        <p class="six-bar" :style="barStyle.sixBar"></p>
+        <p class="zero-bar" :style="barStyle.zeroBar"></p>
         <p class="ver-line"
            v-for="(item,index) in verLine"
            :style="{left:1.281 * index + 'rem'}">
@@ -55,7 +57,18 @@
           year: moment().format('YYYY'),
           month: moment().format('MM')
         },
-        calendarDate: []
+        calendarDate: [],
+        weeks:[],
+        barStyle:{
+          sixBar:{
+            left:0,
+            width:0
+          },
+          zeroBar:{
+            left:0,
+            width:0
+          }
+        }
       }
     },
     created() {
@@ -69,12 +82,14 @@
         for (let i = 0; i < 7; i++) {
           this.calendarDate.push({
             day: moment().add(i, 'days').format('DD'),
-            week: that.chinaWeek(moment().add(i, 'days').format('d')),
+            week: that._chinaWeek(moment().add(i, 'days').format('d')),
             isToDay:now.getDay() == moment().add(i, 'days').format('d')
           })
+          this.weeks.push(moment().add(i, 'days').format('d'))
         }
+        that._barStyle()
       },
-      chinaWeek(num) {
+      _chinaWeek(num) {
         let week = ''
         switch (Number(num)) {
           case 0:
@@ -100,6 +115,22 @@
             break
         }
         return week
+      },
+      _barStyle(){
+        const that = this
+        this.weeks.map((v,i)=>{
+          if(v == 6){
+            that.barStyle.sixBar = {
+              left:i * 1.281 + 'rem',
+              width:1.281 + 'rem'
+            }
+          }else if(v == 0){
+            that.barStyle.zeroBar = {
+              left:i * 1.281 + 'rem',
+              width:1.281 + 'rem'
+            }
+          }
+        })
       }
     }
   }
@@ -196,6 +227,9 @@
             align-items: baseline;
             justify-content: center;
           }
+          .num{
+            font-size: .35rem;
+          }
           .txt {
             font-size: .3rem;
           }
@@ -212,6 +246,9 @@
           justify-content: center;
           position: absolute;
           left: .12rem;
+          .num{
+            font-size: .35rem;
+          }
           .txt {
             font-size: .3rem;
           }
@@ -224,11 +261,18 @@
         flex: 1;
         background-color: #f7f7f7;
         z-index: 8;
+        .six-bar,.zero-bar{
+          background: #fff;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          z-index: 10;
+        }
         .ver-line {
           position: absolute;
           top: 0;
           border-left: 1px solid #d9d9d9;
-          z-index: 10;
+          z-index: 15;
           height: 100%;
         }
         .cross-line {
@@ -236,7 +280,7 @@
           left: 0;
           width: 100%;
           border-top: 1px solid #d9d9d9;
-          z-index: 10;
+          z-index: 15;
         }
       }
     }
