@@ -40,7 +40,9 @@
            v-for="(item,index) in crossLine"
            :style="{top:sizeRem * index + 'rem'}">
         </p>
-        <p class="btn" v-for="(item,index) in btns" :style="item">已约</p>
+        <transition-group name="btn-scale">
+          <p class="btn" v-for="(item,index) in btns" :key="index" :style="item">已约</p>
+        </transition-group>
       </div>
     </div>
     <div class="user-info">
@@ -244,6 +246,13 @@
 </script>
 
 <style scoped lang="less">
+  .btn-scale-enter-active, .btn-scale-leave-active {
+    transition: all .4s;
+  }
+  .btn-scale-enter, .btn-scale-leave-to {
+    transform: scale(2);
+    opacity: 0;
+  }
   .book {
     position: relative;
     width: 100%;
