@@ -43,6 +43,18 @@
         <p class="btn" v-for="(item,index) in btns" :style="item">已约</p>
       </div>
     </div>
+    <div class="user-info">
+      <div class="avatar-info">
+        <p class="avatar">
+          <img src="http://wx.qlogo.cn/mmopen/PNg30VCHvXaXz3k9Xh5sYd7sn57KFHAnkSz1UVdQo2Sbn3pAFBtvt0wS7LTib7a5zGa5EWDwX8955YAX8lDNyPicNdrbFDSm05/0"/>
+        </p>
+        <div class="avatar-name">
+          <p class="name">成都一护的课表</p>
+          <p class="date">未来七日约课表</p>
+        </div>
+      </div>
+      <p class="we-btn">教练好小程序</p>
+    </div>
   </div>
 </template>
 
@@ -95,6 +107,7 @@
         this.calendarDate = []
         for (let i = 0; i < 7; i++) {
           this.calendarDate.push({
+            date: moment().add(i, 'days').format('YYYY年MM月DD日') + " 周" + that._chinaWeek(moment().add(i, 'days').format('d')),
             day: moment().add(i, 'days').format('DD'),
             week: that._chinaWeek(moment().add(i, 'days').format('d')),
             isToDay: now.getDay() == moment().add(i, 'days').format('d')
@@ -112,8 +125,15 @@
         if (centerObj.isCenter) {
           const y = centerObj.index + 0.5
           const x = Math.ceil(offsetX / sizePx)
+          const start = (String(Math.floor(y-1)).length > 1 ? String(Math.floor(y-1)) : 0 + String(Math.floor(y-1))) + ':30'
+          const end = (String(Math.floor(y)).length > 1 ? String(Math.floor(y)) : 0 + String(Math.floor(y))) + ':30'
+          const date = that.calendarDate[x - 1].date
+
           //是否冲突
           if (that._isClash(x, y)) return
+          console.log(date)
+          console.log(start + '-' + end)
+
           this.btns.push({
             left: (x - 1) * that.sizeRem + 0.057 + 'rem',
             top: (y - 1) * that.sizeRem + 0.049 + 'rem'
@@ -122,7 +142,13 @@
         } else {
           const y = Math.ceil(offsetY / sizePx)
           const x = Math.ceil(offsetX / sizePx)
+          const start = (String(y - 1).length > 1 ? String(y - 1) : 0 + String(y - 1)) + ':00'
+          const end = (String(y).length > 1 ? String(y) : 0 + String(y)) + ':00'
+          const date = that.calendarDate[x - 1].date
+
           if (that._isClash(x, y)) return
+          console.log(date)
+          console.log(start + '-' + end)
           this.btns.push({
             left: (x - 1) * that.sizeRem + 0.057 + 'rem',
             top: (y - 1) * that.sizeRem + 0.049 + 'rem'
@@ -174,7 +200,7 @@
         }
         return {isCenter: isCenter, index: index}
       },
-      //判断相同x,点击是否冲突
+      //相同X轴，点击判断是否重叠
       _isClash(x, y) {
         let isClash = false
         this.offset.map((v, i) => {
@@ -224,6 +250,58 @@
     display: flex;
     display: -webkit-flex;
     flex-flow: column nowrap;
+    .user-info{
+      height: 2rem;
+      width: 100%;
+      position: fixed;
+      background: #4b4b4b;
+      z-index: 100;
+      display: flex;
+      display: -webkit-flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      padding: .3rem;
+      box-sizing: border-box;
+      align-items: center;
+      bottom: 0;
+      .avatar-info{
+        display: flex;
+        display: -webkit-flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        .avatar{
+          width: 1.3rem;
+          height: 1.3rem;
+          border-radius: 50%;
+          overflow: hidden;
+          img{
+            width: 100%;
+          }
+        }
+        .avatar-name{
+          display: flex;
+          display: -webkit-flex;
+          flex-flow: column nowrap;
+          margin-left: .35rem;
+          .name{
+            font-size: .43rem;
+            color: #fff;
+            margin-bottom: .1rem;
+          }
+          .date{
+            font-size: .33rem;
+            color: rgba(255,255,255,.6);
+          }
+        }
+      }
+      .we-btn{
+        padding: .2rem .5rem;
+        background: linear-gradient(to right, #01bafa, #00b3f9);
+        color: #fff;
+        font-size: .35rem;
+        border-radius: 4px;
+      }
+    }
     .top-list {
       display: flex;
       display: -webkit-flex;
@@ -289,6 +367,7 @@
       display: -webkit-flex;
       flex-flow: row nowrap;
       top: 1.6rem;
+      margin-bottom: 2rem;
       .time {
         width: 1rem;
         height: 100%;

@@ -3,6 +3,9 @@ import App from './App'
 import router from './router'
 import fastclick from 'fastclick'
 import axios from 'axios'
+import {Style,Button} from 'cube-ui'
+
+Vue.use(Button)
 
 fastclick.attach(document.body)
 
