@@ -74,10 +74,7 @@
             width: 0
           }
         }, //周末颜色条
-        offset: {
-          x: 0,
-          y: 0
-        },  //点击位置
+        offset: [],  //点击位置
         btns: [],
         crossLines: []
       }
@@ -108,21 +105,30 @@
       },
       //获取点击位置
       onTap(e) {
-        if (e.target.className !== 'calendar') {
-          return
-        }
-        let [offsetX, offsetY, sizePx, that] = [e.offsetX, e.offsetY, this.sizePx, this]
-
-        this.offset = {
-          x: Math.ceil(offsetX / sizePx),
-          y: Math.ceil(offsetY / sizePx)
-        }
-        this.btns.push({
-          left: (that.offset.x - 1) * that.sizeRem + 0.057 + 'rem',
-          top: (that.offset.y - 1) * that.sizeRem + 0.049 + 'rem'
-        })
+        if (e.target.className !== 'calendar') return
+        let [that, offsetX, offsetY, sizePx] = [this, e.offsetX, e.offsetY, this.sizePx]
+        const centerObj = that._isClickCenter(offsetY)
         //判断是否点击中间部分
-        console.log(this._isClickCenter(offsetY))
+        if (centerObj.isCenter) {
+          const y = centerObj.index + 0.5
+          const x = Math.ceil(offsetX / sizePx)
+          //是否冲突
+          if (that._isClash(x, y)) return
+          this.btns.push({
+            left: (x - 1) * that.sizeRem + 0.057 + 'rem',
+            top: (y - 1) * that.sizeRem + 0.049 + 'rem'
+          })
+          this.offset.push({x: x, y: y})
+        } else {
+          const y = Math.ceil(offsetY / sizePx)
+          const x = Math.ceil(offsetX / sizePx)
+          if (that._isClash(x, y)) return
+          this.btns.push({
+            left: (x - 1) * that.sizeRem + 0.057 + 'rem',
+            top: (y - 1) * that.sizeRem + 0.049 + 'rem'
+          })
+          this.offset.push({x: x, y: y})
+        }
       },
       //周末样式
       _barStyle() {
@@ -142,27 +148,43 @@
         })
       },
       //计算每条横线距离顶部高度
-      _listCrossLinesHeight(){
+      _listCrossLinesHeight() {
         const crossLines = this.$refs.crossLines
-        for(let i = 0; i<crossLines.length; i++){
+        for (let i = 0; i < crossLines.length; i++) {
           this.crossLines.push(crossLines[i].offsetTop)
         }
       },
       //判断是否点击中间部分
-      _isClickCenter(offsetY){
-        const that = this
-        for(let i=0; i<that.crossLines.length; i++){
+      _isClickCenter(offsetY) {
+        let [that, isCenter, index] = [this, false, 0]
+
+        for (let i = 0; i < that.crossLines.length; i++) {
           let height1 = that.crossLines[i]
-          let height2 = that.crossLines[i+1]
-          if(offsetY >= height1 && offsetY < height2){
-            const diff = Math.abs(height2 - offsetY) > Math.abs(height1 - offsetY) ? Math.abs(height1 - offsetY) : Math.abs(height2 - offsetY)
-            if(diff < 10){
-              return true
-            }else {
-              return false
+          let height2 = that.crossLines[i + 1]
+          if (offsetY >= height1 && offsetY < height2) {
+            const direction = Math.abs(height2 - offsetY) > Math.abs(height1 - offsetY)
+            const diff = direction ? Math.abs(height1 - offsetY) : Math.abs(height2 - offsetY)
+            index = direction ? i : i + 1
+            if (diff < 10) {
+              isCenter = true
+            } else {
+              isCenter = false
             }
           }
         }
+        return {isCenter: isCenter, index: index}
+      },
+      //判断相同x,点击是否冲突
+      _isClash(x, y) {
+        let isClash = false
+        this.offset.map((v, i) => {
+          if (v.x == x) {
+            if (Math.abs(v.y - y) < 1) {
+              isClash = true
+            }
+          }
+        })
+        return isClash
       },
       _chinaWeek(num) {
         let week = ''
@@ -359,6 +381,7 @@
           text-align: center;
           line-height: 1.18rem;
           font-size: .32rem;
+          z-index: 30;
         }
       }
     }
