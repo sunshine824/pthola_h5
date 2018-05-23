@@ -57,6 +57,19 @@
       </div>
       <p class="we-btn">教练好小程序</p>
     </div>
+    <transition name="model-scale">
+      <div class="model" v-if="isFade">
+        <p class="title">确认约课</p>
+        <div class="model-body">
+
+        </div>
+        <div class="bottoms">
+          <p class="sure">确认</p>
+          <p class="cancel" @click="toggleFade">取消</p>
+        </div>
+      </div>
+    </transition>
+    <div class="mask" @click="toggleFade" v-if="isFade"></div>
   </div>
 </template>
 
@@ -90,7 +103,8 @@
         }, //周末颜色条
         offset: [],  //点击位置
         btns: [],
-        crossLines: []
+        crossLines: [],
+        isFade:false
       }
     },
     created() {
@@ -118,6 +132,9 @@
         }
         that._barStyle()
       },
+      toggleFade(){
+        this.isFade = !this.isFade
+      },
       //获取点击位置
       onTap(e) {
         if (e.target.className !== 'calendar') return
@@ -133,6 +150,9 @@
 
           //是否冲突
           if (that._isClash(x, y)) return
+          setTimeout(()=>{
+            that.toggleFade()
+          },100)
           console.log(date)
           console.log(start + '-' + end)
 
@@ -149,6 +169,9 @@
           const date = that.calendarDate[x - 1].date
 
           if (that._isClash(x, y)) return
+          setTimeout(()=>{
+            that.toggleFade()
+          },100)
           console.log(date)
           console.log(start + '-' + end)
           this.btns.push({
@@ -250,6 +273,13 @@
     transition: all .4s;
   }
   .btn-scale-enter, .btn-scale-leave-to {
+    transform: scale(2);
+    opacity: 0;
+  }
+  .model-scale-enter-active, .model-scale-leave-active {
+    transition: all .4s;
+  }
+  .model-scale-enter, .model-scale-leave-to {
     transform: scale(2);
     opacity: 0;
   }
@@ -472,6 +502,71 @@
           z-index: 30;
         }
       }
+    }
+    .model{
+      width: 7.6rem;
+      height: 9rem;
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      border-radius: 4px;
+      border: 1px solid #d9d9d9;
+      position: fixed;
+      z-index: 1000;
+      background: #fff;
+      left: 50%;
+      margin-left: -3.8rem;
+      top: 50%;
+      margin-top: -4.5rem;
+      .title{
+        font-size: .45rem;
+        color: #666;
+        margin-top: .4rem;
+        margin-bottom: .4rem;
+        text-align: center;
+      }
+      .model-body{
+
+      }
+      .bottoms{
+        position: absolute;
+        bottom: 0;
+        height: 1.2rem;
+        display: flex;
+        display: -webkit-flex;
+        width: 100%;
+        flex-flow: row nowrap;
+        border-top: 1px solid #d9d9d9;
+        p{
+          width: 100%;
+          height: 100%;
+          font-size: .44rem;
+          border-right: 1px solid #d9d9d9;
+          text-align: center;
+          line-height: 1.2rem;
+          color: #fc9153;
+          &:last-child{
+            border-right: none;
+            color: #999;
+            &:active{
+              background-color: rgba(0,0,0,.04);
+            }
+          }
+          &:first-child{
+            &:active{
+              background-color: rgba(252,145,83,.04);
+            }
+          }
+        }
+      }
+    }
+    .mask{
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,.3);
+      z-index: 100;
     }
   }
 </style>
