@@ -3,9 +3,10 @@ import App from './App'
 import router from './router'
 import fastclick from 'fastclick'
 import axios from 'axios'
-import {Style,Button} from 'cube-ui'
+import {Style,Button,Select} from 'cube-ui'
 
 Vue.use(Button)
+Vue.use(Select)
 
 fastclick.attach(document.body)
 

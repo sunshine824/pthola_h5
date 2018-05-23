@@ -61,7 +61,9 @@
       <div class="model" v-if="isFade">
         <p class="title">确认约课</p>
         <div class="model-body">
+          <cube-select @picker-show="test" v-model="value" :options="options">
 
+          </cube-select>
         </div>
         <div class="bottoms">
           <p class="sure">确认</p>
@@ -104,7 +106,9 @@
         offset: [],  //点击位置
         btns: [],
         crossLines: [],
-        isFade:false
+        isFade:false,
+        options: [2013, 2014, 2015, 2016, 2017, 2018],
+        value: 2016
       }
     },
     created() {
@@ -117,6 +121,9 @@
       this._listCrossLinesHeight()
     },
     methods: {
+      test(){
+        console.log(1)
+      },
       getCalendarDate() {
         const that = this
         const now = new Date()
@@ -511,7 +518,7 @@
       border-radius: 4px;
       border: 1px solid #d9d9d9;
       position: fixed;
-      z-index: 1000;
+      z-index: 99;
       background: #fff;
       left: 50%;
       margin-left: -3.8rem;
@@ -525,7 +532,7 @@
         text-align: center;
       }
       .model-body{
-
+        padding: .3rem;
       }
       .bottoms{
         position: absolute;
@@ -566,7 +573,7 @@
       right: 0;
       bottom: 0;
       background: rgba(0,0,0,.3);
-      z-index: 100;
+      z-index: 90;
     }
   }
 </style>
