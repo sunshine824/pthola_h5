@@ -48,7 +48,8 @@
     <div class="user-info">
       <div class="avatar-info">
         <p class="avatar">
-          <img src="http://wx.qlogo.cn/mmopen/PNg30VCHvXaXz3k9Xh5sYd7sn57KFHAnkSz1UVdQo2Sbn3pAFBtvt0wS7LTib7a5zGa5EWDwX8955YAX8lDNyPicNdrbFDSm05/0"/>
+          <img
+            src="http://wx.qlogo.cn/mmopen/PNg30VCHvXaXz3k9Xh5sYd7sn57KFHAnkSz1UVdQo2Sbn3pAFBtvt0wS7LTib7a5zGa5EWDwX8955YAX8lDNyPicNdrbFDSm05/0"/>
         </p>
         <div class="avatar-name">
           <p class="name">成都一护的课表</p>
@@ -63,7 +64,7 @@
         <div class="model-body">
           <cube-select v-model="params.date" :options="sevenDate"></cube-select>
 
-          <cube-select v-model="params.time" :options="options"></cube-select>
+          <cube-select v-model="params.time" :options="arrTime"></cube-select>
         </div>
         <div class="bottoms">
           <p class="sure">确认</p>
@@ -92,7 +93,7 @@
           month: moment().format('MM')
         },  //当前年月
         calendarDate: [],  //未来七天日期
-        sevenDate:[],
+        sevenDate: [],
         weeks: [],
         barStyle: {
           sixBar: {
@@ -107,11 +108,11 @@
         offset: [],  //点击位置
         btns: [],
         crossLines: [],
-        isFade:false,
-        options: ['00:00-01:00','00:30-01:30','01:00-02:00','01:30-02:30'],
-        params:{
-          date:'',
-          time:'00:30-01:30'
+        isFade: false,
+        arrTime: [],
+        params: {
+          date: '',
+          time: ''
         }
       }
     },
@@ -119,10 +120,13 @@
       this.getCalendarDate()
     },
     mounted() {
+      //console.log(moment.unix(1526605200).format('HH:mm')+'-'+moment.unix(1526608800).format('HH:mm'))
       //获取计算后的格子像素
       this.sizePx = this.$refs.sizeItem[0].clientWidth
       //计算每条横线距离顶部高度
       this._listCrossLinesHeight()
+      //初始化时间段
+      this._initTime()
     },
     methods: {
       getCalendarDate() {
@@ -141,9 +145,9 @@
         }
         that._barStyle()
       },
-      toggleFade(options){
+      toggleFade(options) {
         this.isFade = !this.isFade
-        if(options==='cancel'){
+        if (options === 'cancel') {
           this.btns.pop()
           this.offset.pop()
         }
@@ -157,42 +161,46 @@
         if (centerObj.isCenter) {
           const y = centerObj.index + 0.5
           const x = Math.ceil(offsetX / sizePx)
-          const start = (String(Math.floor(y-1)).length > 1 ? String(Math.floor(y-1)) : 0 + String(Math.floor(y-1))) + ':30'
+          const start = (String(Math.floor(y - 1)).length > 1 ? String(Math.floor(y - 1)) : 0 + String(Math.floor(y - 1))) + ':30'
           const end = (String(Math.floor(y)).length > 1 ? String(Math.floor(y)) : 0 + String(Math.floor(y))) + ':30'
           const date = that.calendarDate[x - 1].date
 
           //是否冲突
           if (that._isClash(x, y)) return
-          setTimeout(()=>{
-            that.toggleFade()
-          },100)
-          console.log(date)
-          console.log(start + '-' + end)
 
+          this.params = {
+            date: date,
+            time: start + '-' + end
+          }
           this.btns.push({
             left: (x - 1) * that.sizeRem + 0.057 + 'rem',
             top: (y - 1) * that.sizeRem + 0.049 + 'rem'
           })
           this.offset.push({x: x, y: y})
+          setTimeout(() => {
+            that.toggleFade()
+          }, 100)
         } else {
           const y = Math.ceil(offsetY / sizePx)
           const x = Math.ceil(offsetX / sizePx)
           const start = (String(y - 1).length > 1 ? String(y - 1) : 0 + String(y - 1)) + ':00'
           const end = (String(y).length > 1 ? String(y) : 0 + String(y)) + ':00'
           const date = that.calendarDate[x - 1].date
-
           if (that._isClash(x, y)) return
 
-          setTimeout(()=>{
-            that.toggleFade()
-          },100)
-          console.log(date)
-          console.log(start + '-' + end)
+          this.params = {
+            date: date,
+            time: start + '-' + end
+          }
           this.btns.push({
             left: (x - 1) * that.sizeRem + 0.057 + 'rem',
             top: (y - 1) * that.sizeRem + 0.049 + 'rem'
           })
+
           this.offset.push({x: x, y: y})
+          setTimeout(() => {
+            that.toggleFade()
+          }, 100)
         }
       },
       //周末样式
@@ -251,6 +259,19 @@
         })
         return isClash
       },
+      //初始化时间段
+      _initTime() {
+        let arrTime = []
+        for (let i = 0; i < 24; i++) {
+          const time0 = (String(i).length > 1 ? String(i) : 0 + String(i)) + ':00' + '-' + (String(i + 1).length > 1 ? String(i + 1) : 0 + String(i + 1)) + ':00';
+          const time1 = i < 23 ? (String(i).length > 1 ? String(i) : 0 + String(i)) + ':30' + '-' + (String(i + 1).length > 1 ? String(i + 1) : 0 + String(i + 1)) + ':30' : ''
+          arrTime.push(time0)
+          if(time1){
+            arrTime.push(time1)
+          }
+        }
+        this.arrTime = arrTime
+      },
       _chinaWeek(num) {
         let week = ''
         switch (Number(num)) {
@@ -286,24 +307,28 @@
   .btn-scale-enter-active, .btn-scale-leave-active {
     transition: all .4s;
   }
+
   .btn-scale-enter, .btn-scale-leave-to {
     transform: scale(2);
     opacity: 0;
   }
+
   .model-scale-enter-active, .model-scale-leave-active {
     transition: all .4s;
   }
+
   .model-scale-enter, .model-scale-leave-to {
     transform: scale(2);
     opacity: 0;
   }
+
   .book {
     position: relative;
     width: 100%;
     display: flex;
     display: -webkit-flex;
     flex-flow: column nowrap;
-    .user-info{
+    .user-info {
       height: 2rem;
       width: 100%;
       position: fixed;
@@ -317,37 +342,37 @@
       box-sizing: border-box;
       align-items: center;
       bottom: 0;
-      .avatar-info{
+      .avatar-info {
         display: flex;
         display: -webkit-flex;
         flex-flow: row nowrap;
         align-items: center;
-        .avatar{
+        .avatar {
           width: 1.3rem;
           height: 1.3rem;
           border-radius: 50%;
           overflow: hidden;
-          img{
+          img {
             width: 100%;
           }
         }
-        .avatar-name{
+        .avatar-name {
           display: flex;
           display: -webkit-flex;
           flex-flow: column nowrap;
           margin-left: .35rem;
-          .name{
+          .name {
             font-size: .43rem;
             color: #fff;
             margin-bottom: .1rem;
           }
-          .date{
+          .date {
             font-size: .33rem;
-            color: rgba(255,255,255,.6);
+            color: rgba(255, 255, 255, .6);
           }
         }
       }
-      .we-btn{
+      .we-btn {
         padding: .2rem .5rem;
         background: linear-gradient(to right, #01bafa, #00b3f9);
         color: #fff;
@@ -517,7 +542,7 @@
         }
       }
     }
-    .model{
+    .model {
       width: 7.6rem;
       height: 6.4rem;
       -webkit-border-radius: 4px;
@@ -531,20 +556,20 @@
       margin-left: -3.8rem;
       top: 50%;
       margin-top: -3.2rem;
-      .title{
+      .title {
         font-size: .45rem;
         color: #666;
         margin-top: .4rem;
         margin-bottom: .4rem;
         text-align: center;
       }
-      .model-body{
+      .model-body {
         padding: .3rem;
-        .cube-select{
+        .cube-select {
           margin-bottom: .3rem;
         }
       }
-      .bottoms{
+      .bottoms {
         position: absolute;
         bottom: 0;
         height: 1.2rem;
@@ -553,7 +578,7 @@
         width: 100%;
         flex-flow: row nowrap;
         border-top: 1px solid #d9d9d9;
-        p{
+        p {
           width: 100%;
           height: 100%;
           font-size: .44rem;
@@ -561,28 +586,28 @@
           text-align: center;
           line-height: 1.2rem;
           color: #fc9153;
-          &:last-child{
+          &:last-child {
             border-right: none;
             color: #999;
-            &:active{
-              background-color: rgba(0,0,0,.04);
+            &:active {
+              background-color: rgba(0, 0, 0, .04);
             }
           }
-          &:first-child{
-            &:active{
-              background-color: rgba(252,145,83,.04);
+          &:first-child {
+            &:active {
+              background-color: rgba(252, 145, 83, .04);
             }
           }
         }
       }
     }
-    .mask{
+    .mask {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,.3);
+      background: rgba(0, 0, 0, .3);
       z-index: 90;
     }
   }
