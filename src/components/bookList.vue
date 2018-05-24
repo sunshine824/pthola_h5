@@ -121,12 +121,16 @@
     },
     mounted() {
       //console.log(moment.unix(1526605200).format('HH:mm')+'-'+moment.unix(1526608800).format('HH:mm'))
+      //console.log(moment.unix(1526605200).format('d'))
       //获取计算后的格子像素
       this.sizePx = this.$refs.sizeItem[0].clientWidth
       //计算每条横线距离顶部高度
       this._listCrossLinesHeight()
       //初始化时间段
       this._initTime()
+      this._initOffset({week: '1', time: '01:00-02:00'}).then(res=>{
+        console.log(res)
+      })
     },
     methods: {
       getCalendarDate() {
@@ -266,7 +270,7 @@
           const time0 = (String(i).length > 1 ? String(i) : 0 + String(i)) + ':00' + '-' + (String(i + 1).length > 1 ? String(i + 1) : 0 + String(i + 1)) + ':00';
           const time1 = i < 23 ? (String(i).length > 1 ? String(i) : 0 + String(i)) + ':30' + '-' + (String(i + 1).length > 1 ? String(i + 1) : 0 + String(i + 1)) + ':30' : ''
           arrTime.push(time0)
-          if(time1){
+          if (time1) {
             arrTime.push(time1)
           }
         }
@@ -299,6 +303,24 @@
         }
         return week
       },
+      //初始化坐标值
+      _initOffset(obj) {
+        let promise1 = new Promise((resolve, reject) => {
+          this.weeks.map((v, i) => {
+            if (v === obj.week) {
+              resolve(i + 1)
+            }
+          })
+        })
+        let promise2 = new Promise(((resolve, reject) => {
+          this.arrTime.map((v, i) => {
+            if (v === obj.time) {
+              resolve((i + 2) / 2)
+            }
+          })
+        }))
+        return Promise.all([promise1, promise2])
+      }
     }
   }
 </script>
