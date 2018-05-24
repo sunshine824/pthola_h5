@@ -3,12 +3,11 @@ import App from './App'
 import router from './router'
 import fastclick from 'fastclick'
 import axios from 'axios'
-import {Style,Button,Select} from 'cube-ui'
-
-Vue.use(Button)
-Vue.use(Select)
+import Cube from 'cube-ui'
 
 fastclick.attach(document.body)
+
+Vue.use(Cube)
 
 Vue.config.productionTip = false
 

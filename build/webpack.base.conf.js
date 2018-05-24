@@ -3,7 +3,6 @@ const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
-var PostCompilePlugin = require('webpack-post-compile-plugin')
 var TransformModulesPlugin = require('webpack-transform-modules-plugin')
 
 function resolve (dir) {
@@ -28,11 +27,11 @@ module.exports = {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       '@': resolve('src'),
+      'cube-ui': 'cube-ui/lib'
     }
   },
   plugins: [
     // ...
-    new PostCompilePlugin(),
     new TransformModulesPlugin()
   ],
   module: {

@@ -12,11 +12,13 @@
     "test": "npm run unit && npm run e2e",
     "build": "node build/build.js"
   },
-  "compileDependencies": ["cube-ui"],
   "transformModules": {
     "cube-ui": {
-      "transform": "cube-ui/src/modules/${member}",
-      "kebabCase": true
+      "transform": "cube-ui/lib/${member}",
+      "kebabCase": true,
+      "style": {
+        "ignore": ["create-api", "better-scroll"]
+      }
     }
   },
   "dependencies": {

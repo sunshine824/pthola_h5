@@ -61,13 +61,13 @@
       <div class="model" v-if="isFade">
         <p class="title">确认约课</p>
         <div class="model-body">
-          <cube-select @picker-show="test" v-model="value" :options="options">
+          <cube-select v-model="params.date" :options="sevenDate"></cube-select>
 
-          </cube-select>
+          <cube-select v-model="params.time" :options="options"></cube-select>
         </div>
         <div class="bottoms">
           <p class="sure">确认</p>
-          <p class="cancel" @click="toggleFade">取消</p>
+          <p class="cancel" @click="toggleFade('cancel')">取消</p>
         </div>
       </div>
     </transition>
@@ -92,6 +92,7 @@
           month: moment().format('MM')
         },  //当前年月
         calendarDate: [],  //未来七天日期
+        sevenDate:[],
         weeks: [],
         barStyle: {
           sixBar: {
@@ -107,8 +108,11 @@
         btns: [],
         crossLines: [],
         isFade:false,
-        options: [2013, 2014, 2015, 2016, 2017, 2018],
-        value: 2016
+        options: ['00:00-01:00','00:30-01:30','01:00-02:00','01:30-02:30'],
+        params:{
+          date:'',
+          time:'00:30-01:30'
+        }
       }
     },
     created() {
@@ -121,9 +125,6 @@
       this._listCrossLinesHeight()
     },
     methods: {
-      test(){
-        console.log(1)
-      },
       getCalendarDate() {
         const that = this
         const now = new Date()
@@ -136,11 +137,16 @@
             isToDay: now.getDay() == moment().add(i, 'days').format('d')
           })
           this.weeks.push(moment().add(i, 'days').format('d'))
+          this.sevenDate.push(moment().add(i, 'days').format('YYYY年MM月DD日') + " 周" + that._chinaWeek(moment().add(i, 'days').format('d')))
         }
         that._barStyle()
       },
-      toggleFade(){
+      toggleFade(options){
         this.isFade = !this.isFade
+        if(options==='cancel'){
+          this.btns.pop()
+          this.offset.pop()
+        }
       },
       //获取点击位置
       onTap(e) {
@@ -176,6 +182,7 @@
           const date = that.calendarDate[x - 1].date
 
           if (that._isClash(x, y)) return
+
           setTimeout(()=>{
             that.toggleFade()
           },100)
@@ -512,7 +519,7 @@
     }
     .model{
       width: 7.6rem;
-      height: 9rem;
+      height: 6.4rem;
       -webkit-border-radius: 4px;
       -moz-border-radius: 4px;
       border-radius: 4px;
@@ -523,7 +530,7 @@
       left: 50%;
       margin-left: -3.8rem;
       top: 50%;
-      margin-top: -4.5rem;
+      margin-top: -3.2rem;
       .title{
         font-size: .45rem;
         color: #666;
@@ -533,6 +540,9 @@
       }
       .model-body{
         padding: .3rem;
+        .cube-select{
+          margin-bottom: .3rem;
+        }
       }
       .bottoms{
         position: absolute;
