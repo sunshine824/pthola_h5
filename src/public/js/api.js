@@ -20,3 +20,13 @@ export function addCourse(params) {
   const result = post('api/2.0.0/add.about',params)
   return result
 }
+
+/**
+ * 获取约课列表
+ * @param params
+ * @returns {*}
+ */
+export function getBookList(params) {
+  const result = post('api/2.0.0/my.reservation',params)
+  return result
+}

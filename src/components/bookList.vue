@@ -1,6 +1,6 @@
 <template>
   <div class="book clearfix">
-    <calendar ref="calendar" @handleOk="handleOk"/>
+    <calendar ref="calendar" @handleOk="_addCourse"/>
     <div class="user-info">
       <div class="avatar-info">
         <p class="avatar">
@@ -21,7 +21,8 @@
   import Calendar from '@/base/calendar'
   import {
     getWeChatCode,
-    addCourse
+    addCourse,
+    getBookList
   } from '@/public/js/api'
 
   export default {
@@ -34,6 +35,7 @@
     },
     created() {
       //this._getWeChatCode()
+      this._getBookList()
     },
     methods: {
       //微信授权获取code
@@ -48,7 +50,8 @@
           console.log(err)
         })
       },
-      handleOk(data) {
+      //添加学员约课
+      _addCourse(data) {
         const that = this
         const result = addCourse({
           coach_id: 3,
@@ -68,6 +71,17 @@
               that.$refs.calendar.handleCancel('cancel')
             }
           }).show()
+        })
+      },
+      //预约列表
+      _getBookList(){
+        const result = getBookList({
+          unionid: 'oB_TltyUFpd_-wK5taxd243ZD6Ow'
+        })
+        result.then(res=>{
+          console.log(res)
+        }).catch(err=>{
+          console.log(err.response)
         })
       }
     }
