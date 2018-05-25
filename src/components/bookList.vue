@@ -122,6 +122,7 @@
     mounted() {
       //console.log(moment.unix(1526605200).format('HH:mm')+'-'+moment.unix(1526608800).format('HH:mm'))
       //console.log(moment.unix(1526605200).format('d'))
+      console.log(moment('2018年05月27日 05:00','YYYY年MM月DD日 HH:mm').format('X'))
       //获取计算后的格子像素
       this.sizePx = this.$refs.sizeItem[0].clientWidth
       //计算每条横线距离顶部高度
