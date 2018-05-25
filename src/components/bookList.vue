@@ -1,6 +1,9 @@
 <template>
   <div class="book clearfix">
-    <calendar ref="calendar" @handleOk="_addCourse"/>
+    <calendar
+      ref="calendar"
+      @handleOk="_addCourse"
+      :bookList="bookList ? bookList : []"/>
     <div class="user-info">
       <div class="avatar-info">
         <p class="avatar">
@@ -31,7 +34,9 @@
       Calendar
     },
     data() {
-      return {}
+      return {
+        bookList:[]
+      }
     },
     created() {
       //this._getWeChatCode()
@@ -80,6 +85,7 @@
         })
         result.then(res=>{
           console.log(res)
+          this.bookList = res
         }).catch(err=>{
           console.log(err.response)
         })

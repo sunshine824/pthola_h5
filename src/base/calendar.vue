@@ -67,6 +67,12 @@
   import moment from 'moment'
 
   export default {
+    props: {
+      bookList: {
+        type: Array,
+        default: []
+      }
+    },
     data() {
       let _this = this
       return {
