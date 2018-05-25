@@ -49,16 +49,25 @@
         })
       },
       handleOk(data) {
+        const that = this
         const result = addCourse({
           coach_id: 3,
           start_time: data.start_time,
           end_time: data.end_time,
-          unionid: 'oB_TltyUFpd_-wK5taxd243ZD6Ow'
+          unionid: 'oB_TltzAhiXP-AInYg0pc8sVj3Gw'
         })
         result.then(res => {
-          this.$refs.calendar.handleCancel()
+          that.$refs.calendar.handleCancel()
         }).catch(err => {
-          console.log(err.response)
+          that.$createDialog({
+            type: 'alert',
+            title: err.response.data.message,
+            content: '您还不是该教练的学员，请联系您的教练：将您加入他的学员名单，并录入您的正确手机号码，您才可以进行约课。',
+            icon: 'cubeic-alert',
+            onConfirm(){
+              that.$refs.calendar.handleCancel('cancel')
+            }
+          }).show()
         })
       }
     }
