@@ -17,7 +17,7 @@ export function getWeChatCode(params) {
  * @returns {*}
  */
 export function addCourse(params) {
-  const result = post('api/2.0.0/add.about',params)
+  const result = post('api/2.0.0/add.about', params)
   return result
 }
 
@@ -27,6 +27,16 @@ export function addCourse(params) {
  * @returns {*}
  */
 export function getBookList(params) {
-  const result = post('api/2.0.0/my.reservation',params)
+  const result = post('api/2.0.0/my.reservation', params)
+  return result
+}
+
+/**
+ * 修改学员约课
+ * @param params
+ * @returns {*}
+ */
+export function editCourse(params) {
+  const result = post('api/2.0.0/edit.about', params)
   return result
 }

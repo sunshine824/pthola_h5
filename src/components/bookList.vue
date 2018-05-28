@@ -2,7 +2,7 @@
   <div class="book clearfix">
     <calendar
       ref="calendar"
-      @handleOk="_addCourse"/>
+      @handleOk="handleOk"/>
     <div class="user-info">
       <div class="avatar-info">
         <p class="avatar">
@@ -24,7 +24,8 @@
   import {
     getWeChatCode,
     addCourse,
-    getBookList
+    getBookList,
+    editCourse
   } from '@/public/js/api'
 
   export default {
@@ -52,6 +53,14 @@
           console.log(err)
         })
       },
+      handleOk(data){
+        console.log(data)
+        if(data.id){
+          this._editCourse(data)
+        }else {
+          this._addCourse(data)
+        }
+      },
       //添加学员约课
       _addCourse(data) {
         const that = this
@@ -59,11 +68,10 @@
           coach_id: 3,
           start_time: data.start_time,
           end_time: data.end_time,
-          unionid: 'oB_TltyUFpd_-wK5taxd243ZD6Ow'
         })
         result.then(res => {
           that.$refs.calendar.handleCancel()
-          that.$refs.calendar._refresh(data.week, data.time)
+          that.$refs.calendar._refresh(data.week, data.time, res.id)
         }).catch(err => {
           that.$createDialog({
             type: 'alert',
@@ -76,11 +84,25 @@
           }).show()
         })
       },
+      //编辑约课
+      _editCourse(data){
+        const that = this
+        const result = editCourse({
+          id:data.id,
+          coach_id:3,
+          start_time: data.start_time,
+          end_time: data.end_time,
+        })
+        result.then(res=>{
+          that.$refs.calendar.handleCancel()
+          that.$refs.calendar._refresh(data.week, data.time, data.id)
+        }).catch(err=>{
+          console.log(err.response)
+        })
+      },
       //预约列表
       _getBookList() {
-        const result = getBookList({
-          unionid: 'oB_TltyUFpd_-wK5taxd243ZD6Ow'
-        })
+        const result = getBookList()
         result.then(res => {
           this.$refs.calendar._initOffset(res)
         }).catch(err => {

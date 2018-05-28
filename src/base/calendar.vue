@@ -41,7 +41,8 @@
            :style="{top:sizeRem * index + 'rem'}">
         </p>
         <transition-group name="btn-scale">
-          <p class="btn" v-for="(item,index) in btns" :key="index" :style="item">已约</p>
+          <p class="btn" @click="editCourse(index)" v-for="(item,index) in offset" :key="index"
+             :style="{left:item.left,top:item.top}">已约</p>
         </transition-group>
       </div>
     </div>
@@ -68,7 +69,6 @@
 
   export default {
     data() {
-      let _this = this
       return {
         sizeRem: 1.281,  //每个格子rem
         sizePx: 0,  //每个格子计算后的px
@@ -93,13 +93,13 @@
           }
         }, //周末颜色条
         offset: [],  //点击位置
-        btns: [],
         crossLines: [],
         isFade: false,
         arrTime: [],
         params: {
           date: '',
-          time: ''
+          time: '',
+          id: ''
         },
       }
     },
@@ -136,15 +136,31 @@
       },
       handleCancel(options) {
         this.isFade = false
-        this.btns.pop()
+        if (this.params.id) return
         this.offset.pop()
       },
+      //确认排课
       handleOk() {
         let [date, time] = [this.params.date.split(' '), this.params.time.split('-')]
         const start_time = moment((date[0] + ' ' + time[0]), 'YYYY年MM月DD日 HH:mm').format('X')
         const end_time = moment((date[0] + ' ' + time[1]), 'YYYY年MM月DD日 HH:mm').format('X')
         const week = moment.unix(start_time).format('d')
-        this.$emit('handleOk', {start_time: start_time, end_time: end_time, week: week, time: this.params.time})
+        this.$emit('handleOk', {
+          start_time: start_time,
+          end_time: end_time,
+          week: week,
+          time: this.params.time,
+          id: this.params.id
+        })
+      },
+      //编辑排课
+      editCourse(index) {
+        this.params = {
+          date: this.offset[index].date,
+          time: this.offset[index].time,
+          id: this.offset[index].id
+        }
+        this.toggleFade()
       },
       //获取点击位置
       onTap(e) {
@@ -164,13 +180,19 @@
 
           this.params = {
             date: date,
-            time: start + '-' + end
+            time: start + '-' + end,
+            id: ''
           }
-          this.btns.push({
+
+          this.offset.push({
+            x: x,
+            y: y,
             left: (x - 1) * that.sizeRem + 0.057 + 'rem',
-            top: (y - 1) * that.sizeRem + 0.049 + 'rem'
+            top: (y - 1) * that.sizeRem + 0.049 + 'rem',
+            date: date,
+            time: start + '-' + end,
+            id: ''
           })
-          this.offset.push({x: x, y: y})
           setTimeout(() => {
             that.toggleFade()
           }, 100)
@@ -184,14 +206,19 @@
 
           this.params = {
             date: date,
-            time: start + '-' + end
+            time: start + '-' + end,
+            id: ''
           }
-          this.btns.push({
-            left: (x - 1) * that.sizeRem + 0.057 + 'rem',
-            top: (y - 1) * that.sizeRem + 0.049 + 'rem'
-          })
 
-          this.offset.push({x: x, y: y})
+          this.offset.push({
+            x: x,
+            y: y,
+            left: (x - 1) * that.sizeRem + 0.057 + 'rem',
+            top: (y - 1) * that.sizeRem + 0.049 + 'rem',
+            date: date,
+            time: start + '-' + end,
+            id: ''
+          })
           setTimeout(() => {
             that.toggleFade()
           }, 100)
@@ -316,19 +343,26 @@
         arr.map((v, i) => {
           const week = moment.unix(v.start_time).format('d')
           const time = moment.unix(v.start_time).format('HH:mm') + '-' + moment.unix(v.end_time).format('HH:mm')
-          this._refresh(week, time)
+          this._refresh(week, time, v.id)
         })
       },
-      _refresh(week, time) {
-        const _this = this
+      _refresh(week, time, id) {
+        let [_this, offset] = [this, this.offset]
+        //去重
+        for (let [index, elem] of offset.entries()) {
+          if (id === elem.id) {
+            _this.offset.splice(index, 1)
+          }
+        }
         _this._countOffset({week: week, time: time}).then(res => {
           _this.offset.push({
             x: res[0],
-            y: res[1]
-          })
-          _this.btns.push({
+            y: res[1],
             left: (res[0] - 1) * _this.sizeRem + 0.057 + 'rem',
-            top: (res[1] - 1) * _this.sizeRem + 0.049 + 'rem'
+            top: (res[1] - 1) * _this.sizeRem + 0.049 + 'rem',
+            date: _this.calendarDate[res[0] - 1].date,
+            time: time,
+            id: id
           })
         })
       }
