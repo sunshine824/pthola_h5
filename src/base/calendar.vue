@@ -41,8 +41,14 @@
            :style="{top:sizeRem * index + 'rem'}">
         </p>
         <transition-group name="btn-scale">
-          <p class="btn" @click="editCourse(index)" v-for="(item,index) in offset" :key="index"
-             :style="{left:item.left,top:item.top}">已约</p>
+          <p class="btn" v-for="(item,index) in offset.queryData" :key="Number(Date.parse(new Date())) + 1"
+             :style="{left:item.left,top:item.top}">{{item.type===1 ? '我的课' : '已约'}}</p>
+          <p class="btn" @click="editCourse(index)" v-for="(item,index) in offset.reservation" :key="Number(Date.parse(new Date())) + 100"
+             style="background: #f1824a"
+             :style="{left:item.left,top:item.top}">我的<br>预约</p>
+          <p class="btn" v-for="(item,index) in offset.occupation" :key="Number(Date.parse(new Date())) + 1000"
+             :class="item.type ===1 ? 'gray' : ''"
+             :style="{left:item.left,top:item.top}">{{item.type===1 ? '休息' : '已约'}}</p>
         </transition-group>
       </div>
     </div>
@@ -92,7 +98,7 @@
             width: 0
           }
         }, //周末颜色条
-        offset: [],  //点击位置
+        offset: {},  //点击位置
         crossLines: [],
         isFade: false,
         arrTime: [],
@@ -104,6 +110,10 @@
       }
     },
     created() {
+      this.reservation = []
+      this.occupation = []
+      this.queryData = []
+      this.bookList = []
       this.getCalendarDate()
     },
     mounted() {
@@ -184,7 +194,7 @@
             id: ''
           }
 
-          this.offset.push({
+          this.offset.reservation.push({
             x: x,
             y: y,
             left: (x - 1) * that.sizeRem + 0.057 + 'rem',
@@ -210,7 +220,7 @@
             id: ''
           }
 
-          this.offset.push({
+          this.offset.reservation.push({
             x: x,
             y: y,
             left: (x - 1) * that.sizeRem + 0.057 + 'rem',
@@ -271,7 +281,7 @@
       //相同X轴，点击判断是否重叠
       _isClash(x, y) {
         let isClash = false
-        this.offset.map((v, i) => {
+        this.bookList.map((v, i) => {
           if (v.x == x) {
             if (Math.abs(v.y - y) < 1) {
               isClash = true
@@ -340,12 +350,52 @@
       },
       _initOffset(arr) {
         let [_this] = [this]
-        arr.map((v, i) => {
-          const week = moment.unix(v.start_time).format('d')
-          const time = moment.unix(v.start_time).format('HH:mm') + '-' + moment.unix(v.end_time).format('HH:mm')
-          this._refresh(week, time, v.id)
+
+        let promise1 = new Promise((resolve, reject) => {
+          _this._promise(arr, 'reservation')
+          resolve(_this.reservation)
+        })
+
+        let promise2 = new Promise((resolve, reject) => {
+          _this._promise(arr, 'occupation')
+          resolve(_this.occupation)
+        })
+
+        let promise3 = new Promise((resolve, reject) => {
+          _this._promise(arr, 'queryData')
+          resolve(_this.queryData)
+        })
+
+        Promise.all([promise1, promise2, promise3]).then(res => {
+          _this.offset = {
+            reservation: res[0],
+            occupation: res[1],
+            queryData: res[2]
+          }
+          _this.bookList.push(...res[0], ...res[1], ...res[2])
         })
       },
+
+      _promise(arr, opt) {
+        const _this = this
+        arr[opt].map((v, i) => {
+          const week = moment.unix(v.start_time).format('d')
+          const time = moment.unix(v.start_time).format('HH:mm') + '-' + moment.unix(v.end_time).format('HH:mm')
+          _this._countOffset({week: week, time: time}).then(res => {
+            _this[opt].push({
+              x: res[0],
+              y: res[1],
+              left: (res[0] - 1) * _this.sizeRem + 0.057 + 'rem',
+              top: (res[1] - 1) * _this.sizeRem + 0.049 + 'rem',
+              date: _this.calendarDate[res[0] - 1].date,
+              time: time,
+              type: v.type,
+              id: v.id
+            })
+          })
+        })
+      },
+
       _refresh(week, time, id) {
         let [_this, offset] = [this, this.offset]
         //去重
@@ -387,6 +437,10 @@
   .model-scale-enter, .model-scale-leave-to {
     transform: scale(2);
     opacity: 0;
+  }
+
+  .gray {
+    background: #c9c9c9 !important;
   }
 
   .calendar-box {
@@ -550,9 +604,9 @@
           height: 1.18rem;
           flex-flow: column nowrap;
           text-align: center;
-          line-height: 1.18rem;
           font-size: .32rem;
           z-index: 30;
+          display: inline-flex;
         }
       }
     }

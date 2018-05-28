@@ -102,7 +102,9 @@
       },
       //预约列表
       _getBookList() {
-        const result = getBookList()
+        const result = getBookList({
+          coach_id:6
+        })
         result.then(res => {
           this.$refs.calendar._initOffset(res)
         }).catch(err => {

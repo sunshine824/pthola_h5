@@ -27,7 +27,7 @@ export function addCourse(params) {
  * @returns {*}
  */
 export function getBookList(params) {
-  const result = post('api/2.0.0/my.reservation', params)
+  const result = post('api/2.0.0/lists.h5', params)
   return result
 }
 
