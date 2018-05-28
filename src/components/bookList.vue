@@ -2,8 +2,7 @@
   <div class="book clearfix">
     <calendar
       ref="calendar"
-      @handleOk="_addCourse"
-      :bookList="bookList ? bookList : []"/>
+      @handleOk="_addCourse"/>
     <div class="user-info">
       <div class="avatar-info">
         <p class="avatar">
@@ -34,9 +33,7 @@
       Calendar
     },
     data() {
-      return {
-        bookList:[]
-      }
+      return {}
     },
     created() {
       //this._getWeChatCode()
@@ -62,31 +59,31 @@
           coach_id: 3,
           start_time: data.start_time,
           end_time: data.end_time,
-          unionid: 'oB_TltzAhiXP-AInYg0pc8sVj3Gw'
+          unionid: 'oB_TltyUFpd_-wK5taxd243ZD6Ow'
         })
         result.then(res => {
           that.$refs.calendar.handleCancel()
+          that.$refs.calendar._refresh(data.week, data.time)
         }).catch(err => {
           that.$createDialog({
             type: 'alert',
             title: err.response.data.message,
             content: '您还不是该教练的学员，请联系您的教练：将您加入他的学员名单，并录入您的正确手机号码，您才可以进行约课。',
             icon: 'cubeic-alert',
-            onConfirm(){
+            onConfirm() {
               that.$refs.calendar.handleCancel('cancel')
             }
           }).show()
         })
       },
       //预约列表
-      _getBookList(){
+      _getBookList() {
         const result = getBookList({
           unionid: 'oB_TltyUFpd_-wK5taxd243ZD6Ow'
         })
-        result.then(res=>{
-          console.log(res)
-          this.bookList = res
-        }).catch(err=>{
+        result.then(res => {
+          this.$refs.calendar._initOffset(res)
+        }).catch(err => {
           console.log(err.response)
         })
       }

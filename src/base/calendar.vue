@@ -67,12 +67,6 @@
   import moment from 'moment'
 
   export default {
-    props: {
-      bookList: {
-        type: Array,
-        default: []
-      }
-    },
     data() {
       let _this = this
       return {
@@ -106,25 +100,19 @@
         params: {
           date: '',
           time: ''
-        }
+        },
       }
     },
     created() {
       this.getCalendarDate()
     },
     mounted() {
-      //console.log(moment.unix(1526605200).format('HH:mm')+'-'+moment.unix(1526608800).format('HH:mm'))
-      //console.log(moment.unix(1526605200).format('d'))
-      console.log(moment('2018年05月27日 05:00', 'YYYY年MM月DD日 HH:mm').format('X'))
       //获取计算后的格子像素
       this.sizePx = this.$refs.sizeItem[0].clientWidth
       //计算每条横线距离顶部高度
       this._listCrossLinesHeight()
       //初始化时间段
       this._initTime()
-      this._initOffset({week: '1', time: '01:00-02:00'}).then(res => {
-        console.log(res)
-      })
     },
     methods: {
       getCalendarDate() {
@@ -155,9 +143,12 @@
       },
       handleOk() {
         let [date, time] = [this.params.date.split(' '), this.params.time.split('-')]
+        this.btns.pop()
+        this.offset.pop()
         const start_time = moment((date[0] + ' ' + time[0]), 'YYYY年MM月DD日 HH:mm').format('X')
         const end_time = moment((date[0] + ' ' + time[1]), 'YYYY年MM月DD日 HH:mm').format('X')
-        this.$emit('handleOk', {start_time: start_time, end_time: end_time})
+        const week = moment.unix(start_time).format('d')
+        this.$emit('handleOk', {start_time: start_time, end_time: end_time, week: week, time: this.params.time})
       },
       //获取点击位置
       onTap(e) {
@@ -307,7 +298,7 @@
         return week
       },
       //初始化坐标值
-      _initOffset(obj) {
+      _countOffset(obj) {
         let promise1 = new Promise((resolve, reject) => {
           this.weeks.map((v, i) => {
             if (v === obj.week) {
@@ -323,6 +314,27 @@
           })
         }))
         return Promise.all([promise1, promise2])
+      },
+      _initOffset(arr) {
+        let [_this] = [this]
+        arr.map((v, i) => {
+          const week = moment.unix(v.start_time).format('d')
+          const time = moment.unix(v.start_time).format('HH:mm') + '-' + moment.unix(v.end_time).format('HH:mm')
+          this._refresh(week, time)
+        })
+      },
+      _refresh(week, time) {
+        const _this = this
+        _this._countOffset({week: week, time: time}).then(res => {
+          _this.offset.push({
+            x: res[0],
+            y: res[1]
+          })
+          _this.btns.push({
+            left: (res[0] - 1) * _this.sizeRem + 0.057 + 'rem',
+            top: (res[1] - 1) * _this.sizeRem + 0.049 + 'rem'
+          })
+        })
       }
     }
   }
