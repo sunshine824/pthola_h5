@@ -136,15 +136,11 @@
       },
       handleCancel(options) {
         this.isFade = false
-        if (options === 'cancel') {
-          this.btns.pop()
-          this.offset.pop()
-        }
+        this.btns.pop()
+        this.offset.pop()
       },
       handleOk() {
         let [date, time] = [this.params.date.split(' '), this.params.time.split('-')]
-        this.btns.pop()
-        this.offset.pop()
         const start_time = moment((date[0] + ' ' + time[0]), 'YYYY年MM月DD日 HH:mm').format('X')
         const end_time = moment((date[0] + ' ' + time[1]), 'YYYY年MM月DD日 HH:mm').format('X')
         const week = moment.unix(start_time).format('d')
