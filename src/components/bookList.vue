@@ -21,6 +21,7 @@
 
 <script>
   import Calendar from '@/base/calendar'
+  import {ERR} from '@/public/js/config'
   import {
     getWeChatCode,
     addCourse,
@@ -37,27 +38,20 @@
       return {}
     },
     created() {
-      //this._getWeChatCode()
+      this._getWeChatCode()
       this._getBookList()
     },
     methods: {
       //微信授权获取code
       _getWeChatCode() {
         const redirect_uri = encodeURIComponent(window.location.href)
-        const result = getWeChatCode({
-          redirect_uri: redirect_uri
-        })
-        result.then(res => {
-          console.log(res)
-        }).catch(err => {
-          console.log(err)
-        })
+        const result = getWeChatCode(redirect_uri)
+        window.location.href = result
       },
-      handleOk(data){
-        console.log(data)
-        if(data.id){
+      handleOk(data) {
+        if (data.id) {
           this._editCourse(data)
-        }else {
+        } else {
           this._addCourse(data)
         }
       },
@@ -73,10 +67,11 @@
           that.$refs.calendar.handleCancel()
           that.$refs.calendar._refresh(data.week, data.time, res.id)
         }).catch(err => {
+          let code = err.response.data.code
           that.$createDialog({
             type: 'alert',
             title: err.response.data.message,
-            content: '您还不是该教练的学员，请联系您的教练：将您加入他的学员名单，并录入您的正确手机号码，您才可以进行约课。',
+            content: ERR[code].content,
             icon: 'cubeic-alert',
             onConfirm() {
               that.$refs.calendar.handleCancel('cancel')
@@ -85,25 +80,34 @@
         })
       },
       //编辑约课
-      _editCourse(data){
+      _editCourse(data) {
         const that = this
         const result = editCourse({
-          id:data.id,
-          coach_id:6,
+          id: data.id,
+          coach_id: 6,
           start_time: data.start_time,
           end_time: data.end_time,
         })
-        result.then(res=>{
+        result.then(res => {
           that.$refs.calendar.handleCancel()
           that.$refs.calendar._refresh(data.week, data.time, data.id)
-        }).catch(err=>{
-          console.log(err.response)
+        }).catch(err => {
+          let code = err.response.data.code
+          that.$createDialog({
+            type: 'alert',
+            title: err.response.data.message,
+            content: ERR[code].content,
+            icon: 'cubeic-alert',
+            onConfirm() {
+              that.$refs.calendar.handleCancel('cancel')
+            }
+          }).show()
         })
       },
       //预约列表
       _getBookList() {
         const result = getBookList({
-          coach_id:6
+          coach_id: 6
         })
         result.then(res => {
           this.$refs.calendar._initOffset(res)

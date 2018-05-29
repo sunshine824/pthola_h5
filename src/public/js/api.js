@@ -1,4 +1,5 @@
 import {post, get} from './fetch'
+import {serveUrl} from './config'
 
 /**
  * 微信授权获取code
@@ -6,8 +7,8 @@ import {post, get} from './fetch'
  * @param params
  * @returns {Promise<T>}
  */
-export function getWeChatCode(params) {
-  const result = get('api/2.0.0/connect.oauth2.authorize', params)
+export function getWeChatCode(url) {
+  const result = serveUrl + '/api/2.0.0/connect.oauth2.authorize?redirect_uri=' + url
   return result
 }
 

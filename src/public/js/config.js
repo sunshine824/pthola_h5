@@ -1,1 +1,12 @@
-export const serveUrl = 'http://www.jlh.com'
+export const serveUrl = 'http://192.168.31.66'
+export const ERR = {
+  '10404':{
+    content:'该教练本时段已被预约，请修改时间。'
+  },
+  '10405':{
+    content:'该教练本时段已被预约，请修改时间。'
+  },
+  '99998':{
+    content:'您还不是该教练的学员，请联系您的教练：将您加入他的学员名单，并录入您的正确手机号码，您才可以进行约课。'
+  }
+}
