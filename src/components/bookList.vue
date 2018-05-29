@@ -50,7 +50,7 @@
         </div>
       </div>
     </transition>
-    <div class="mask" v-if="isFade"></div>
+    <div class="mask" @click="toggleFade" v-if="isFade"></div>
   </div>
 </template>
 
@@ -97,6 +97,9 @@
       this._getBookList()
     },
     methods: {
+      toggleFade(){
+        this.isFade = !this.isFade
+      },
       wxLoginVerify() {
         let code = this.$route.query.code
         if (!code) {
