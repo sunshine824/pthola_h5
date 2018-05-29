@@ -41,15 +41,22 @@
            :style="{top:sizeRem * index + 'rem'}">
         </p>
         <transition-group name="btn-scale">
-          <p class="btn" v-for="(item,index) in offset.queryData" :key="Number(Date.parse(new Date())) + 1"
+          <p class="btn" v-for="(item,index) in offset.queryData" :key="index"
              :style="{left:item.left,top:item.top}">{{item.type===1 ? '我的课' : '已约'}}</p>
-          <p class="btn" @click="editCourse(index)" v-for="(item,index) in offset.reservation" :key="Number(Date.parse(new Date())) + 100"
+        </transition-group>
+        <transition-group name="btn-scale">
+          <p class="btn" @click="editCourse(index)" v-for="(item,index) in offset.reservation" :key="index"
              style="background: #f1824a"
              :style="{left:item.left,top:item.top}">我的<br>预约</p>
-          <p class="btn" v-for="(item,index) in offset.occupation" :key="Number(Date.parse(new Date())) + 1000"
+        </transition-group>
+        <transition-group name="btn-scale">
+          <p class="btn" v-for="(item,index) in offset.occupation" :key="index"
              :class="item.type ===1 ? 'gray' : ''"
              :style="{left:item.left,top:item.top}">{{item.type===1 ? '休息' : '已约'}}</p>
         </transition-group>
+        <transition name="btn-scale">
+          <p class="btn-op btn" v-if="opBtn.left" :style="{left:opBtn.left,top:opBtn.top}"></p>
+        </transition>
       </div>
     </div>
     <transition name="model-scale">
@@ -107,6 +114,7 @@
           time: '',
           id: ''
         },
+        opBtn: {},  //是否显示初始点击动画
       }
     },
     created() {
@@ -146,8 +154,7 @@
       },
       handleCancel(options) {
         this.isFade = false
-        if (this.params.id) return
-        this.offset.pop()
+        this.opBtn = {}
       },
       //确认排课
       handleOk() {
@@ -166,9 +173,9 @@
       //编辑排课
       editCourse(index) {
         this.params = {
-          date: this.offset[index].date,
-          time: this.offset[index].time,
-          id: this.offset[index].id
+          date: this.offset.reservation[index].date,
+          time: this.offset.reservation[index].time,
+          id: this.offset.reservation[index].id
         }
         this.toggleFade()
       },
@@ -193,8 +200,7 @@
             time: start + '-' + end,
             id: ''
           }
-
-          this.offset.reservation.push({
+          this.opBtn = {
             x: x,
             y: y,
             left: (x - 1) * that.sizeRem + 0.057 + 'rem',
@@ -202,7 +208,7 @@
             date: date,
             time: start + '-' + end,
             id: ''
-          })
+          }
           setTimeout(() => {
             that.toggleFade()
           }, 100)
@@ -219,8 +225,7 @@
             time: start + '-' + end,
             id: ''
           }
-
-          this.offset.reservation.push({
+          this.opBtn = {
             x: x,
             y: y,
             left: (x - 1) * that.sizeRem + 0.057 + 'rem',
@@ -228,7 +233,7 @@
             date: date,
             time: start + '-' + end,
             id: ''
-          })
+          }
           setTimeout(() => {
             that.toggleFade()
           }, 100)
@@ -303,6 +308,7 @@
         }
         this.arrTime = arrTime
       },
+      //星期中文转换
       _chinaWeek(num) {
         let week = ''
         switch (Number(num)) {
@@ -330,7 +336,7 @@
         }
         return week
       },
-      //初始化坐标值
+      //计算x,y坐标值
       _countOffset(obj) {
         let promise1 = new Promise((resolve, reject) => {
           this.weeks.map((v, i) => {
@@ -348,6 +354,7 @@
         }))
         return Promise.all([promise1, promise2])
       },
+      //初始化坐标值
       _initOffset(arr) {
         let [_this] = [this]
 
@@ -375,7 +382,7 @@
           _this.bookList.push(...res[0], ...res[1], ...res[2])
         })
       },
-
+      //promise封装
       _promise(arr, opt) {
         const _this = this
         arr[opt].map((v, i) => {
@@ -395,17 +402,17 @@
           })
         })
       },
-
+      //重新刷新
       _refresh(week, time, id) {
         let [_this, offset] = [this, this.offset]
         //去重
-        for (let [index, elem] of offset.entries()) {
+        for (let [index, elem] of offset.reservation.entries()) {
           if (id === elem.id) {
-            _this.offset.splice(index, 1)
+            _this.offset.reservation.splice(index, 1)
           }
         }
         _this._countOffset({week: week, time: time}).then(res => {
-          _this.offset.push({
+          _this.offset.reservation.push({
             x: res[0],
             y: res[1],
             left: (res[0] - 1) * _this.sizeRem + 0.057 + 'rem',
@@ -607,6 +614,9 @@
           font-size: .32rem;
           z-index: 30;
           display: inline-flex;
+        }
+        .btn-op {
+          background: rgba(72, 187, 208, .5) !important;
         }
       }
     }

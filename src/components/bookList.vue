@@ -65,7 +65,7 @@
       _addCourse(data) {
         const that = this
         const result = addCourse({
-          coach_id: 3,
+          coach_id: 6,
           start_time: data.start_time,
           end_time: data.end_time,
         })
@@ -89,7 +89,7 @@
         const that = this
         const result = editCourse({
           id:data.id,
-          coach_id:3,
+          coach_id:6,
           start_time: data.start_time,
           end_time: data.end_time,
         })
