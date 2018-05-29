@@ -427,21 +427,12 @@
   }
 </script>
 
-<style scoped lang="less">
+<style lang="less">
   .btn-scale-enter-active, .btn-scale-leave-active {
     transition: all .4s;
   }
 
   .btn-scale-enter, .btn-scale-leave-to {
-    transform: scale(2);
-    opacity: 0;
-  }
-
-  .model-scale-enter-active, .model-scale-leave-active {
-    transition: all .4s;
-  }
-
-  .model-scale-enter, .model-scale-leave-to {
     transform: scale(2);
     opacity: 0;
   }

@@ -16,6 +16,41 @@
       </div>
       <p class="we-btn">教练好小程序</p>
     </div>
+    <transition name="model-scale">
+      <div class="model" v-if="isFade" style="border:none">
+        <p class="title">账号登录</p>
+        <div class="model-body">
+          <div class="form-group">
+            <cube-input
+              class="phone"
+              placeholder="请输入手机号"
+              :type="phone.type"
+              :maxlength="phone.maxlength"
+              :autofocus="phone.autofocus"
+              v-model="phone.value">
+            </cube-input>
+          </div>
+          <div class="form-group">
+            <cube-input
+              class="verification"
+              :type="verification.type"
+              :maxlength="verification.maxlength"
+              :autofocus="verification.autofocus"
+              v-model="verification.value"
+              placeholder="请输入验证码">
+            </cube-input>
+            <div class="lyz-right">
+              <p v-if="!isCount" class="code" @click="sendPhoneCode">发送验证码</p>
+              <p v-if="isCount" class="code disabled">{{count}} s</p>
+            </div>
+          </div>
+        </div>
+        <div class="bottoms" style="background: linear-gradient(to right, #01bafa, #00b3f9);">
+          <p class="sure" @click="bindPhone" style="color: #fff; font-weight: bold">确认</p>
+        </div>
+      </div>
+    </transition>
+    <div class="mask" v-if="isFade"></div>
   </div>
 </template>
 
@@ -26,7 +61,8 @@
     addCourse,
     getBookList,
     editCourse,
-    wxStudentLogin
+    wxStudentLogin,
+    sendVerifyCode
   } from '@/public/js/api'
 
   export default {
@@ -35,7 +71,26 @@
       Calendar
     },
     data() {
-      return {}
+      return {
+        isFade: true,
+        phone: {
+          isVerify: false,
+          value: '',
+          type: 'number',
+          maxlength: 11,
+          autofocus: true
+        },
+        verification: {
+          isVerify: false,
+          value: '',
+          maxlength: 4,
+          type: 'number',
+          autofocus: false
+        },
+        wechatopenid: sessionStorage.getItem('openid'),
+        isCount: false,
+        count: 120,
+      }
     },
     created() {
       this.wxLoginVerify()
@@ -50,13 +105,35 @@
           })
         }
         //获取token判断是否绑定手机号
-        this._wxStudentLogin(code)
+        this._wxStudentLogin({wechatcode: code})
+      },
+      //发送验证码
+      sendPhoneCode() {
+        if(!this._verifyPhone()) return
+        const result = sendVerifyCode({
+          phone: this.phone.value
+        })
+        result.then(res => {
+          this.isCount = true
+          this.countDown()
+        }).catch(err => {
+          console.log(err.response)
+        })
+      },
+      //绑定手机号
+      bindPhone() {
+        if(!this._verifyPhone()) return
+        if(!this._verifyCode()) return
+
+        this._wxStudentLogin({
+          phone:this.phone.value,
+          verification:this.verification.value,
+          wechatopenid:this.wechatopenid
+        })
       },
       //获取token判断是否绑定手机号
-      _wxStudentLogin(code) {
-        const result = wxStudentLogin({
-          wechatcode: code
-        })
+      _wxStudentLogin(params) {
+        const result = wxStudentLogin(params)
         result.then(res => {
           console.log(res)
         }).catch(err => {
@@ -67,9 +144,11 @@
             })
           } else if (errInfo.code === 10106) {
             sessionStorage.setItem('openid', errInfo.datum.wechat_openid)
+            this.isFade = true
           }
         })
       },
+      //点击确认
       handleOk(data) {
         if (data.id) {
           this._editCourse(data)
@@ -136,12 +215,83 @@
         }).catch(err => {
           console.log(err.response)
         })
+      },
+      //倒数
+      countDown() {
+        if (this.isCount) {
+          this.timer = setInterval(() => {
+            var countNum = this.count
+            countNum -= 1;
+            if (countNum < 1) {
+              this.isCount = false
+              countNum = 120
+              clearInterval(this.timer)
+            }
+            this.count = countNum
+          }, 1000)
+        }
+      },
+      //验证验证码
+      _verifyCode(){
+        let [verification] = [this.verification.value]
+        if (!verification) {
+          this.$createDialog({
+            type: 'alert',
+            title: '温馨提示',
+            content: '请输入验证码',
+            icon: 'cubeic-alert'
+          }).show()
+          return false
+        } else if (verification.length !== 4) {
+          this.$createDialog({
+            type: 'alert',
+            title: '温馨提示',
+            content: '请输入有效验证码',
+            icon: 'cubeic-alert'
+          }).show()
+          return false
+        }else {
+          return true
+        }
+      },
+      //验证手机号
+      _verifyPhone(){
+        let phone = this.phone.value
+        if (!phone) {
+          this.$createDialog({
+            type: 'alert',
+            title: '温馨提示',
+            content: '请输入手机号',
+            icon: 'cubeic-alert'
+          }).show()
+          return false
+        } else if (phone.length < 11 || phone.length > 11) {
+          this.$createDialog({
+            type: 'alert',
+            title: '温馨提示',
+            content: '请输入11位手机号',
+            icon: 'cubeic-alert'
+          }).show()
+          return false
+        }else {
+          return true
+        }
       }
     }
   }
 </script>
 
-<style scoped lang="less">
+<style lang="less">
+
+  .model-scale-enter-active, .model-scale-leave-active {
+    transition: all .4s;
+  }
+
+  .model-scale-enter, .model-scale-leave-to {
+    transform: scale(2);
+    opacity: 0;
+  }
+
   .book {
     position: relative;
     width: 100%;
@@ -199,6 +349,109 @@
         font-size: .35rem;
         border-radius: 4px;
       }
+    }
+    .model {
+      width: 7.6rem;
+      height: 6rem;
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      border-radius: 4px;
+      border: 1px solid #d9d9d9;
+      position: fixed;
+      z-index: 99;
+      background: #fff;
+      left: 50%;
+      margin-left: -3.8rem;
+      top: 50%;
+      margin-top: -3rem;
+      overflow: hidden;
+      .title {
+        font-size: .45rem;
+        color: #666;
+        margin-top: .4rem;
+        margin-bottom: .4rem;
+        text-align: center;
+      }
+      .model-body {
+        padding: .3rem;
+        .cube-select {
+          margin-bottom: .3rem;
+        }
+        .form-group {
+          position: relative;
+          width: 100%;
+          margin-bottom: .3rem;
+          display: flex;
+          display: -webkit-flex;
+          flex-flow: row nowrap;
+          justify-content: space-between;
+          .phone {
+            width: 100%;
+          }
+          .verification {
+            flex: 1;
+            margin-right: 10px;
+          }
+          .lyz-right {
+
+          }
+          .code {
+            width: 2rem;
+            display: flex;
+            display: -webkit-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background: linear-gradient(to right, #01bafa, #00b3f9);
+            color: #fff;
+            font-size: 12px;
+            border-radius: 2px;
+          }
+          .disabled {
+            background: gray;
+          }
+        }
+      }
+      .bottoms {
+        position: absolute;
+        bottom: 0;
+        height: 1.2rem;
+        display: flex;
+        display: -webkit-flex;
+        width: 100%;
+        flex-flow: row nowrap;
+        border-top: 1px solid #d9d9d9;
+        p {
+          width: 100%;
+          height: 100%;
+          font-size: .44rem;
+          border-right: 1px solid #d9d9d9;
+          text-align: center;
+          line-height: 1.2rem;
+          color: #fc9153;
+          &:last-child {
+            border-right: none;
+            color: #999;
+            &:active {
+              background-color: rgba(0, 0, 0, .04);
+            }
+          }
+          &:first-child {
+            &:active {
+              background-color: rgba(252, 145, 83, .04);
+            }
+          }
+        }
+      }
+    }
+    .mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, .3);
+      z-index: 90;
     }
   }
 </style>

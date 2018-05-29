@@ -33,6 +33,16 @@ export function addCourse(params) {
 }
 
 /**
+ * 发送验证码
+ * @param params
+ * @returns {*}
+ */
+export function sendVerifyCode(params) {
+  const result = post('api/2.0.0/phone.verify.code', params)
+  return result
+}
+
+/**
  * 获取约课列表
  * @param params
  * @returns {*}
