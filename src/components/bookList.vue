@@ -53,19 +53,20 @@
         this._wxStudentLogin(code)
       },
       //获取token判断是否绑定手机号
-      _wxStudentLogin(code){
+      _wxStudentLogin(code) {
         const result = wxStudentLogin({
           wechatcode: code
         })
         result.then(res => {
           console.log(res)
         }).catch(err => {
-          console.log(err.response)
-          let errInfo = err.response
-          if (errInfo.data.code === 10118) {
+          let errInfo = err.response.data
+          if (errInfo.code === 10118) {
             this.$router.push({
               path: '/'
             })
+          } else if (errInfo.code === 10106) {
+            sessionStorage.setItem('openid', errInfo.datum.wechat_openid)
           }
         })
       },
