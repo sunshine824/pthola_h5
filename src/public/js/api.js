@@ -8,7 +8,17 @@ import {serveUrl} from './config'
  * @returns {Promise<T>}
  */
 export function getWeChatCode(url) {
-  const result = serveUrl + '/api/2.0.0/connect.oauth2.authorize?redirect_uri=' + url
+  const result = serveUrl + '/api/2.0.0/connect.oauth2.authorize?redirect_uri=' + url + '&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'
+  return result
+}
+
+/**
+ * 学员微信登录获取token
+ * @param params
+ * @returns {*}
+ */
+export function wxStudentLogin(params) {
+  const result = post('/api/2.0.0/student.web.login', params)
   return result
 }
 

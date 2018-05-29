@@ -23,10 +23,10 @@
   import Calendar from '@/base/calendar'
   import {ERR} from '@/public/js/config'
   import {
-    getWeChatCode,
     addCourse,
     getBookList,
-    editCourse
+    editCourse,
+    wxStudentLogin
   } from '@/public/js/api'
 
   export default {
@@ -38,15 +38,36 @@
       return {}
     },
     created() {
-      this._getWeChatCode()
+      this.wxLoginVerify()
       this._getBookList()
     },
     methods: {
-      //微信授权获取code
-      _getWeChatCode() {
-        const redirect_uri = encodeURIComponent(window.location.href)
-        const result = getWeChatCode(redirect_uri)
-        window.location.href = result
+      wxLoginVerify() {
+        let code = this.$route.query.code
+        if (!code) {
+          this.$router.push({
+            path: '/'
+          })
+        }
+        //获取token判断是否绑定手机号
+        this._wxStudentLogin(code)
+      },
+      //获取token判断是否绑定手机号
+      _wxStudentLogin(code){
+        const result = wxStudentLogin({
+          wechatcode: code
+        })
+        result.then(res => {
+          console.log(res)
+        }).catch(err => {
+          console.log(err.response)
+          let errInfo = err.response
+          if (errInfo.data.code === 10118) {
+            this.$router.push({
+              path: '/'
+            })
+          }
+        })
       },
       handleOk(data) {
         if (data.id) {
