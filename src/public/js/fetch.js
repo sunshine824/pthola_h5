@@ -10,7 +10,7 @@ import qs from 'qs'
  */
 export function post(url, params) {
   let _this = Vue.prototype
-  _this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
+  _this.$http.defaults.headers.common['Authorization'] = 'Bearer ' + sessionStorage.getItem('token');
   return _this.$http({
     method: 'post',
     url: serveUrl + '/' + url,

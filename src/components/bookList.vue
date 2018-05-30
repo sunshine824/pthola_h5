@@ -5,16 +5,18 @@
       @clickTap="clickTap"
       @handleOk="handleOk"/>
     <div class="user-info">
-      <div class="avatar-info">
-        <p class="avatar">
-          <img
-            src="http://wx.qlogo.cn/mmopen/PNg30VCHvXaXz3k9Xh5sYd7sn57KFHAnkSz1UVdQo2Sbn3pAFBtvt0wS7LTib7a5zGa5EWDwX8955YAX8lDNyPicNdrbFDSm05/0"/>
-        </p>
-        <div class="avatar-name">
-          <p class="name">成都一护的课表</p>
-          <p class="date">未来七日约课表</p>
+      <a :href="coachData.url" target="_blank">
+        <div class="avatar-info">
+          <p class="avatar">
+            <img
+              :src="coachData.headimgurl"/>
+          </p>
+          <div class="avatar-name">
+            <p class="name">{{coachData.coach_name}}的课表</p>
+            <p class="date">未来七日约课表</p>
+          </div>
         </div>
-      </div>
+      </a>
       <p class="we-btn">教练好小程序</p>
     </div>
     <transition name="model-scale">
@@ -89,16 +91,18 @@
           type: 'number',
           autofocus: false
         },
-        wechatopenid: sessionStorage.getItem('openid'),
         isCount: false,
         count: 120,
+        coachData: {}
       }
     },
     created() {
+      sessionStorage.removeItem('openid')
+      sessionStorage.removeItem('token')
       let coach_id = this.$route.query.from_key
-      if(coach_id){
+      if (coach_id) {
         sessionStorage.setItem('coach_id', this.$route.query.from_key)
-      }else {
+      } else {
         this.coach_id = sessionStorage.getItem('coach_id')
       }
 
@@ -144,15 +148,16 @@
         this._wxStudentLogin({
           phone: this.phone.value,
           verification: this.verification.value,
-          wechatopenid: this.wechatopenid
+          wechatopenid: sessionStorage.getItem('openid')
         })
       },
       //获取token判断是否绑定手机号
       _wxStudentLogin(params) {
         const result = wxStudentLogin(params)
         result.then(res => {
-          console.log(res)
+          sessionStorage.setItem('token', res.access_token)
           this._getBookList()
+          this.isFade = false
         }).catch(err => {
           let errInfo = err.response.data
           if (errInfo.code === 10118) {
@@ -162,6 +167,12 @@
           } else if (errInfo.code === 10106) {
             sessionStorage.setItem('openid', errInfo.datum.wechat_openid)
             this._getYetBookList()
+          } else if (errInfo.code === 10103) {
+            this.$createDialog({
+              type: 'alert',
+              title: errInfo.message,
+              icon: 'cubeic-alert',
+            }).show()
           }
         })
       },
@@ -177,7 +188,7 @@
       _addCourse(data) {
         const that = this
         const result = addCourse({
-          coach_id: 6,
+          coach_id: that.coach_id,
           start_time: data.start_time,
           end_time: data.end_time,
         })
@@ -202,7 +213,7 @@
         const that = this
         const result = editCourse({
           id: data.id,
-          coach_id: 6,
+          coach_id: that.coach_id,
           start_time: data.start_time,
           end_time: data.end_time,
         })
@@ -228,6 +239,9 @@
           coach_id: this.coach_id
         })
         result.then(res => {
+          if(!this.coachData.coach_name){
+            this.coachData = res.coachData
+          }
           this.$refs.calendar._initOffset(res)
         }).catch(err => {
           console.log(err.response)
@@ -239,6 +253,9 @@
           coach_id: this.coach_id
         })
         result.then(res => {
+          if(!this.coachData.coach_name){
+            this.coachData = res.coachData
+          }
           this.$refs.calendar._initOffset(res)
         }).catch(err => {
           console.log(err.response)
