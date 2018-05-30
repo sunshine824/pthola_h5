@@ -16,7 +16,7 @@
     <div class="lists" :style="{height: sizeRem * time + 'rem'}">
       <!--左侧时间段-->
       <div class="time">
-        <div class="tip" v-for="(item,index) in time">
+        <div class="tip" :ref="index===10 ? 'ten' : ''" v-for="(item,index) in time">
           <p class="tim">
             <span class="num">{{String(index).length > 1 ? String(index) : 0+String(index)}}</span>
             <span class="txt">:00</span>
@@ -125,6 +125,8 @@
       this.getCalendarDate()
     },
     mounted() {
+      let [scrollTenTop] = [this.$refs.ten[0].offsetTop]
+      window.scrollTo(0, scrollTenTop)
       //获取计算后的格子像素
       this.sizePx = this.$refs.sizeItem[0].clientWidth
       //计算每条横线距离顶部高度
