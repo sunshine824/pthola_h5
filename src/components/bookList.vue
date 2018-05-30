@@ -17,7 +17,7 @@
           </div>
         </div>
       </a>
-      <p class="we-btn">教练好小程序</p>
+      <p class="we-btn" @click="showShareImg">教练好小程序</p>
     </div>
     <transition name="model-scale">
       <div class="model" v-if="isFade" style="border:none">
@@ -53,7 +53,12 @@
         </div>
       </div>
     </transition>
-    <div class="mask" @click="toggleFade" v-if="isFade"></div>
+    <transition name="model-scale">
+      <div v-if="isShare" class="share-img">
+        <img src="./../assets/share-bg.png"/>
+      </div>
+    </transition>
+    <div class="mask" @click="hideMask" v-if="isFade || isShare"></div>
   </div>
 </template>
 
@@ -93,7 +98,8 @@
         },
         isCount: false,
         count: 120,
-        coachData: {}
+        coachData: {},
+        isShare: false
       }
     },
     created() {
@@ -109,6 +115,9 @@
       this.wxLoginVerify()
     },
     methods: {
+      showShareImg(){
+        this.isShare = !this.isShare
+      },
       clickTap() {
         if (!sessionStorage.getItem('token')) {
           this.toggleFade()
@@ -116,6 +125,10 @@
       },
       toggleFade() {
         this.isFade = !this.isFade
+      },
+      hideMask(){
+        this.isFade = false
+        this.isShare = false
       },
       wxLoginVerify() {
         let code = this.$route.query.code
@@ -167,7 +180,7 @@
           } else if (errInfo.code === 10106) {
             sessionStorage.setItem('openid', errInfo.datum.wechat_openid)
             this._getYetBookList()
-          } else if (errInfo.code === 10103) {
+          } else {
             this.$createDialog({
               type: 'alert',
               title: errInfo.message,
@@ -239,7 +252,7 @@
           coach_id: this.coach_id
         })
         result.then(res => {
-          if(!this.coachData.coach_name){
+          if (!this.coachData.coach_name) {
             this.coachData = res.coachData
           }
           this.$refs.calendar._initOffset(res)
@@ -253,7 +266,7 @@
           coach_id: this.coach_id
         })
         result.then(res => {
-          if(!this.coachData.coach_name){
+          if (!this.coachData.coach_name) {
             this.coachData = res.coachData
           }
           this.$refs.calendar._initOffset(res)
@@ -487,6 +500,17 @@
             }
           }
         }
+      }
+    }
+    .share-img{
+      width: 260px;
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      margin-left: -130px;
+      z-index: 99;
+      img{
+        width: 100%;
       }
     }
     .mask {
