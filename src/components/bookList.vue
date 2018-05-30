@@ -2,6 +2,7 @@
   <div class="book clearfix">
     <calendar
       ref="calendar"
+      @clickTap="clickTap"
       @handleOk="handleOk"/>
     <div class="user-info">
       <div class="avatar-info">
@@ -62,7 +63,8 @@
     getBookList,
     editCourse,
     wxStudentLogin,
-    sendVerifyCode
+    sendVerifyCode,
+    getYetBookList
   } from '@/public/js/api'
 
   export default {
@@ -72,7 +74,7 @@
     },
     data() {
       return {
-        isFade: true,
+        isFade: false,
         phone: {
           isVerify: false,
           value: '',
@@ -93,11 +95,22 @@
       }
     },
     created() {
+      let coach_id = this.$route.query.from_key
+      if(coach_id){
+        sessionStorage.setItem('coach_id', this.$route.query.from_key)
+      }else {
+        this.coach_id = sessionStorage.getItem('coach_id')
+      }
+
       this.wxLoginVerify()
-      this._getBookList()
     },
     methods: {
-      toggleFade(){
+      clickTap() {
+        if (!sessionStorage.getItem('token')) {
+          this.toggleFade()
+        }
+      },
+      toggleFade() {
         this.isFade = !this.isFade
       },
       wxLoginVerify() {
@@ -112,7 +125,7 @@
       },
       //发送验证码
       sendPhoneCode() {
-        if(!this._verifyPhone()) return
+        if (!this._verifyPhone()) return
         const result = sendVerifyCode({
           phone: this.phone.value
         })
@@ -125,13 +138,13 @@
       },
       //绑定手机号
       bindPhone() {
-        if(!this._verifyPhone()) return
-        if(!this._verifyCode()) return
+        if (!this._verifyPhone()) return
+        if (!this._verifyCode()) return
 
         this._wxStudentLogin({
-          phone:this.phone.value,
-          verification:this.verification.value,
-          wechatopenid:this.wechatopenid
+          phone: this.phone.value,
+          verification: this.verification.value,
+          wechatopenid: this.wechatopenid
         })
       },
       //获取token判断是否绑定手机号
@@ -139,6 +152,7 @@
         const result = wxStudentLogin(params)
         result.then(res => {
           console.log(res)
+          this._getBookList()
         }).catch(err => {
           let errInfo = err.response.data
           if (errInfo.code === 10118) {
@@ -147,7 +161,7 @@
             })
           } else if (errInfo.code === 10106) {
             sessionStorage.setItem('openid', errInfo.datum.wechat_openid)
-            this.isFade = true
+            this._getYetBookList()
           }
         })
       },
@@ -211,7 +225,18 @@
       //预约列表
       _getBookList() {
         const result = getBookList({
-          coach_id: 6
+          coach_id: this.coach_id
+        })
+        result.then(res => {
+          this.$refs.calendar._initOffset(res)
+        }).catch(err => {
+          console.log(err.response)
+        })
+      },
+      //获取已同意约课（包括休息占位）
+      _getYetBookList() {
+        const result = getYetBookList({
+          coach_id: this.coach_id
         })
         result.then(res => {
           this.$refs.calendar._initOffset(res)
@@ -235,7 +260,7 @@
         }
       },
       //验证验证码
-      _verifyCode(){
+      _verifyCode() {
         let [verification] = [this.verification.value]
         if (!verification) {
           this.$createDialog({
@@ -253,12 +278,12 @@
             icon: 'cubeic-alert'
           }).show()
           return false
-        }else {
+        } else {
           return true
         }
       },
       //验证手机号
-      _verifyPhone(){
+      _verifyPhone() {
         let phone = this.phone.value
         if (!phone) {
           this.$createDialog({
@@ -276,7 +301,7 @@
             icon: 'cubeic-alert'
           }).show()
           return false
-        }else {
+        } else {
           return true
         }
       }

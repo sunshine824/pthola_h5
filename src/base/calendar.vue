@@ -184,6 +184,10 @@
         if (e.target.className !== 'calendar') return
         let [that, offsetX, offsetY, sizePx] = [this, e.offsetX, e.offsetY, this.sizePx]
         const centerObj = that._isClickCenter(offsetY)
+        //派发点击事件
+        this.$emit('clickTap')
+        //未绑定手机号
+        if (!sessionStorage.getItem('token')) return
         //判断是否点击中间部分
         if (centerObj.isCenter) {
           const y = centerObj.index + 0.5
@@ -357,6 +361,7 @@
       //初始化坐标值
       _initOffset(arr) {
         let [_this] = [this]
+        _this.bookList = []
 
         let promise1 = new Promise((resolve, reject) => {
           _this._promise(arr, 'reservation')

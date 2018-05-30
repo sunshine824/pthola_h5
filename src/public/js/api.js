@@ -43,12 +43,22 @@ export function sendVerifyCode(params) {
 }
 
 /**
- * 获取约课列表
+ * 获取总约课列表
  * @param params
  * @returns {*}
  */
 export function getBookList(params) {
   const result = post('api/2.0.0/lists.h5', params)
+  return result
+}
+
+/**
+ * 获取已同意约课列表（包括休息占位）
+ * @param params
+ * @returns {*}
+ */
+export function getYetBookList(params) {
+  const result = post('api/2.0.0/no.logo.lists.h5', params)
   return result
 }
 
