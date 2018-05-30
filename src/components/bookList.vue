@@ -503,11 +503,13 @@
       }
     }
     .share-img{
-      width: 260px;
+      width: 280px;
+      height: 360px;
       position: fixed;
-      top: 20%;
+      top: 50%;
       left: 50%;
-      margin-left: -130px;
+      margin-left: -140px;
+      margin-top: -180px;
       z-index: 99;
       img{
         width: 100%;
