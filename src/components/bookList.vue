@@ -59,11 +59,13 @@
       </div>
     </transition>
     <div class="mask" @click="hideMask" v-if="isFade || isShare"></div>
+    <loading v-if="isLoading"></loading>
   </div>
 </template>
 
 <script>
   import Calendar from '@/base/calendar'
+  import Loading from '@/base/loading'
   import {ERR} from '@/public/js/config'
   import {
     addCourse,
@@ -77,7 +79,8 @@
   export default {
     name: "book-list",
     components: {
-      Calendar
+      Calendar,
+      Loading
     },
     data() {
       return {
@@ -99,7 +102,8 @@
         isCount: false,
         count: 120,
         coachData: {},
-        isShare: false
+        isShare: false,
+        isLoading: false
       }
     },
     created() {
@@ -115,7 +119,7 @@
       this.wxLoginVerify()
     },
     methods: {
-      showShareImg(){
+      showShareImg() {
         this.isShare = !this.isShare
       },
       clickTap() {
@@ -126,7 +130,7 @@
       toggleFade() {
         this.isFade = !this.isFade
       },
-      hideMask(){
+      hideMask() {
         this.isFade = false
         this.isShare = false
       },
@@ -166,6 +170,7 @@
       },
       //获取token判断是否绑定手机号
       _wxStudentLogin(params) {
+        this.isLoading =  true
         const result = wxStudentLogin(params)
         result.then(res => {
           sessionStorage.setItem('token', res.access_token)
@@ -191,6 +196,7 @@
       },
       //点击确认
       handleOk(data) {
+        this.isLoading = true
         if (data.id) {
           this._editCourse(data)
         } else {
@@ -206,6 +212,7 @@
           end_time: data.end_time,
         })
         result.then(res => {
+          this.isLoading = false
           that.$refs.calendar.handleCancel()
           that.$refs.calendar._refresh(data.week, data.time, res.id)
         }).catch(err => {
@@ -231,6 +238,7 @@
           end_time: data.end_time,
         })
         result.then(res => {
+          this.isLoading = false
           that.$refs.calendar.handleCancel()
           that.$refs.calendar._refresh(data.week, data.time, data.id)
         }).catch(err => {
@@ -255,6 +263,7 @@
           if (!this.coachData.coach_name) {
             this.coachData = res.coachData
           }
+          this.isLoading =  false
           this.$refs.calendar._initOffset(res)
         }).catch(err => {
           console.log(err.response)
@@ -269,6 +278,7 @@
           if (!this.coachData.coach_name) {
             this.coachData = res.coachData
           }
+          this.isLoading =  false
           this.$refs.calendar._initOffset(res)
         }).catch(err => {
           console.log(err.response)
@@ -502,7 +512,7 @@
         }
       }
     }
-    .share-img{
+    .share-img {
       width: 280px;
       height: 360px;
       position: fixed;
@@ -511,7 +521,7 @@
       margin-left: -140px;
       margin-top: -180px;
       z-index: 99;
-      img{
+      img {
         width: 100%;
       }
     }
