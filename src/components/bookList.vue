@@ -5,7 +5,7 @@
       @clickTap="clickTap"
       @handleOk="handleOk"/>
     <div class="user-info">
-      <a :href="coachData.url" target="_blank">
+      <a style="text-decoration: none" :href="coachData.url" target="_blank">
         <div class="avatar-info">
           <p class="avatar">
             <img
