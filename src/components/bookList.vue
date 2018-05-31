@@ -216,6 +216,7 @@
           that.$refs.calendar.handleCancel()
           that.$refs.calendar._refresh(data.week, data.time, res.id)
         }).catch(err => {
+          this.isLoading = false
           let code = err.response.data.code
           that.$createDialog({
             type: 'alert',
@@ -242,6 +243,7 @@
           that.$refs.calendar.handleCancel()
           that.$refs.calendar._refresh(data.week, data.time, data.id)
         }).catch(err => {
+          this.isLoading = false
           let code = err.response.data.code
           that.$createDialog({
             type: 'alert',
@@ -266,6 +268,7 @@
           this.isLoading =  false
           this.$refs.calendar._initOffset(res)
         }).catch(err => {
+          this.isLoading =  false
           console.log(err.response)
         })
       },
@@ -281,6 +284,7 @@
           this.isLoading =  false
           this.$refs.calendar._initOffset(res)
         }).catch(err => {
+          this.isLoading =  false
           console.log(err.response)
         })
       },
