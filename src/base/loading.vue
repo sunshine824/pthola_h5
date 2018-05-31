@@ -31,6 +31,7 @@
     background: rgba(0,0,0,.65);
     border-radius: 4px;
     z-index: 99;
+    opacity: 1;
     .load{
       width: 100%;
       height: 100%;

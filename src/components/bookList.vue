@@ -108,7 +108,6 @@
     },
     created() {
       sessionStorage.removeItem('openid')
-      sessionStorage.removeItem('token')
       let coach_id = this.$route.query.from_key
       if (coach_id) {
         sessionStorage.setItem('coach_id', this.$route.query.from_key)
@@ -135,14 +134,19 @@
         this.isShare = false
       },
       wxLoginVerify() {
-        let code = this.$route.query.code
-        if (!code) {
+        let [code, token] = [this.$route.query.code, sessionStorage.getItem('token')]
+        if (token) {
+          this._getBookList()
+          return
+        }else if(!token && code){
+          //获取token判断是否绑定手机号
+          this._wxStudentLogin({wechatcode: code})
+          return
+        }else {
           this.$router.push({
             path: '/'
           })
         }
-        //获取token判断是否绑定手机号
-        this._wxStudentLogin({wechatcode: code})
       },
       //发送验证码
       sendPhoneCode() {
@@ -170,7 +174,7 @@
       },
       //获取token判断是否绑定手机号
       _wxStudentLogin(params) {
-        this.isLoading =  true
+        this.isLoading = true
         const result = wxStudentLogin(params)
         result.then(res => {
           sessionStorage.setItem('token', res.access_token)
@@ -265,10 +269,10 @@
           if (!this.coachData.coach_name) {
             this.coachData = res.coachData
           }
-          this.isLoading =  false
+          this.isLoading = false
           this.$refs.calendar._initOffset(res)
         }).catch(err => {
-          this.isLoading =  false
+          this.isLoading = false
           console.log(err.response)
         })
       },
@@ -281,10 +285,10 @@
           if (!this.coachData.coach_name) {
             this.coachData = res.coachData
           }
-          this.isLoading =  false
+          this.isLoading = false
           this.$refs.calendar._initOffset(res)
         }).catch(err => {
-          this.isLoading =  false
+          this.isLoading = false
           console.log(err.response)
         })
       },
