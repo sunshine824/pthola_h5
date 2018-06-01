@@ -189,6 +189,7 @@
             sessionStorage.setItem('openid', errInfo.datum.wechat_openid)
             this._getYetBookList()
           } else {
+            this.isLoading = false
             this.$createDialog({
               type: 'alert',
               title: errInfo.message,
