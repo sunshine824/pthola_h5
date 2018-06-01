@@ -463,14 +463,14 @@
         display: -webkit-flex;
         flex-flow: column nowrap;
         color: #fff;
-        font-size: .35rem;
+        font-size: 13px;
         height: 100%;
         width: 1rem;
         justify-content: center;
         align-items: center;
         .year {
           margin-bottom: .1rem;
-          padding: .1rem;
+          height: 20px;
         }
       }
       .menu {
@@ -491,13 +491,13 @@
           height: 100%;
           .day {
             margin-bottom: .1rem;
-            padding: .1rem;
             font-size: 13px;
-            width: 15px;
-            height: 15px;
+            width: 20px;
+            height: 20px;
             overflow: hidden;
             text-align: center;
-            line-height: 15px;
+            line-height: 20px;
+            display: block;
             &.today {
               background: #888787;
               border-radius: 50%;
