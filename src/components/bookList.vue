@@ -48,7 +48,7 @@
             </div>
           </div>
         </div>
-        <div class="bottoms" style="background: linear-gradient(to right, #01bafa, #00b3f9);">
+        <div class="bottoms" style="background: linear-gradient(to right, #01bafa, #00b3f9); border-top: none;">
           <p class="sure" @click="bindPhone" style="color: #fff; font-weight: bold">确认</p>
         </div>
       </div>
@@ -162,9 +162,9 @@
       },
       //绑定手机号
       bindPhone() {
-        this.isLoading = true
         if (!this._verifyPhone()) return
         if (!this._verifyCode()) return
+        this.isLoading = true
 
         this._wxStudentLogin({
           phone: this.phone.value,
@@ -267,6 +267,7 @@
         result.then(res => {
           if (!this.coachData.coach_name) {
             this.coachData = res.coachData
+            document.title = '学员约课-' + res.coachData.coach_name + '课表'
           }
           this.isLoading = false
           this.$refs.calendar._initOffset(res)
@@ -283,6 +284,7 @@
         result.then(res => {
           if (!this.coachData.coach_name) {
             this.coachData = res.coachData
+            document.title = '学员约课-' + res.coachData.coach_name + '课表'
           }
           this.isLoading = false
           this.$refs.calendar._initOffset(res)

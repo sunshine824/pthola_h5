@@ -485,13 +485,19 @@
           flex-flow: column nowrap;
           align-items: center;
           justify-content: center;
-          font-size: .35rem;
+          font-size: 13px;
           color: #fff;
           width: 1.281rem;
           height: 100%;
           .day {
             margin-bottom: .1rem;
             padding: .1rem;
+            font-size: 13px;
+            width: 15px;
+            height: 15px;
+            overflow: hidden;
+            text-align: center;
+            line-height: 15px;
             &.today {
               background: #888787;
               border-radius: 50%;
