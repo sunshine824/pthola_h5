@@ -13,7 +13,7 @@
         </div>
       </div>
     </div>
-    <div class="lists">
+    <div class="lists" ref="lists">
       <div class="list-main" :style="{height: sizeRem * time + 'rem'}">
         <!--左侧时间段-->
         <div class="time">
@@ -127,8 +127,8 @@
       this.getCalendarDate()
     },
     mounted() {
-      let [scrollTenTop] = [this.$refs.ten[0].offsetTop]
-      window.scrollTo(0, scrollTenTop)
+      let [scrollTenTop, elem] = [this.$refs.ten[0].offsetTop, this.$refs.lists]
+      elem.scrollTop = scrollTenTop
       //获取计算后的格子像素
       this.sizePx = this.$refs.sizeItem[0].clientWidth
       //计算每条横线距离顶部高度
@@ -507,8 +507,8 @@
       width: 100%;
       flex: 1;
       overflow-y: scroll;
-      -webkit-overflow-scrolling : touch;
-      .list-main{
+      -webkit-overflow-scrolling: touch;
+      .list-main {
         background: #fff;
         display: flex;
         display: -webkit-flex;
