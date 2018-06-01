@@ -103,18 +103,15 @@
         count: 120,
         coachData: {},
         isShare: false,
-        isLoading: false
+        isLoading: false,
       }
     },
     created() {
       sessionStorage.removeItem('openid')
       let coach_id = this.$route.query.from_key
       if (coach_id) {
-        sessionStorage.setItem('coach_id', this.$route.query.from_key)
-      } else {
-        this.coach_id = sessionStorage.getItem('coach_id')
+        sessionStorage.setItem('coach_id', coach_id)
       }
-
       this.wxLoginVerify()
     },
     methods: {
@@ -134,15 +131,16 @@
         this.isShare = false
       },
       wxLoginVerify() {
+        this.isLoading = true
         let [code, token] = [this.$route.query.code, sessionStorage.getItem('token')]
         if (token) {
           this._getBookList()
           return
-        }else if(!token && code){
+        } else if (!token && code) {
           //获取token判断是否绑定手机号
           this._wxStudentLogin({wechatcode: code})
           return
-        }else {
+        } else {
           this.$router.push({
             path: '/'
           })
@@ -174,7 +172,6 @@
       },
       //获取token判断是否绑定手机号
       _wxStudentLogin(params) {
-        this.isLoading = true
         const result = wxStudentLogin(params)
         result.then(res => {
           sessionStorage.setItem('token', res.access_token)
@@ -211,7 +208,7 @@
       _addCourse(data) {
         const that = this
         const result = addCourse({
-          coach_id: that.coach_id,
+          coach_id: sessionStorage.getItem('coach_id'),
           start_time: data.start_time,
           end_time: data.end_time,
         })
@@ -238,7 +235,7 @@
         const that = this
         const result = editCourse({
           id: data.id,
-          coach_id: that.coach_id,
+          coach_id: sessionStorage.getItem('coach_id'),
           start_time: data.start_time,
           end_time: data.end_time,
         })
@@ -263,7 +260,7 @@
       //预约列表
       _getBookList() {
         const result = getBookList({
-          coach_id: this.coach_id
+          coach_id: sessionStorage.getItem('coach_id')
         })
         result.then(res => {
           if (!this.coachData.coach_name) {
@@ -279,7 +276,7 @@
       //获取已同意约课（包括休息占位）
       _getYetBookList() {
         const result = getYetBookList({
-          coach_id: this.coach_id
+          coach_id: sessionStorage.getItem('coach_id')
         })
         result.then(res => {
           if (!this.coachData.coach_name) {
@@ -384,10 +381,11 @@
       display: -webkit-flex;
       flex-flow: row nowrap;
       justify-content: space-between;
-      padding: .3rem;
+      padding: 0 .3rem;
       box-sizing: border-box;
       align-items: center;
       bottom: 0;
+      transition: all .2s;
       .avatar-info {
         display: flex;
         display: -webkit-flex;

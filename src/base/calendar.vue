@@ -13,9 +13,9 @@
         </div>
       </div>
     </div>
-    <div class="lists" :style="{height: sizeRem * time + 'rem'}">
+    <div class="lists" :style="{height: sizeRem * time + 2 + 'rem'}">
       <!--左侧时间段-->
-      <div class="time">
+      <div class="time" :style="{height: sizeRem * time + 'rem'}">
         <div class="tip" :ref="index===10 ? 'ten' : ''" v-for="(item,index) in time">
           <p class="tim">
             <span class="num">{{String(index).length > 1 ? String(index) : 0+String(index)}}</span>
@@ -28,7 +28,7 @@
         </p>
       </div>
       <!--右侧排课列表-->
-      <div class="calendar" @click="onTap($event)">
+      <div class="calendar" :style="{height: sizeRem * time + 'rem'}" @click="onTap($event)">
         <!--<p class="six-bar" :style="barStyle.sixBar"></p>-->
         <!--<p class="zero-bar" :style="barStyle.zeroBar"></p>-->
         <p class="ver-line"
@@ -58,6 +58,7 @@
           <p class="btn-op btn" v-if="opBtn.left" :style="{left:opBtn.left,top:opBtn.top}"></p>
         </transition>
       </div>
+      <!--<div class="space-box"></div>-->
     </div>
     <transition name="model-scale">
       <div class="model" v-if="isFade">
@@ -87,7 +88,7 @@
         sizePx: 0,  //每个格子计算后的px
         time: 24,  //24小时
         verLine: 7,  //7条竖线
-        crossLine: 24,  //24条横线
+        crossLine: 25,  //24条横线
         date: {
           year: moment().format('YYYY'),
           month: moment().format('MM')
@@ -453,6 +454,7 @@
     display: -webkit-flex;
     width: 100%;
     flex-flow: column nowrap;
+    position: relative;
     .top-list {
       display: flex;
       display: -webkit-flex;
@@ -464,6 +466,7 @@
       top: 0;
       background: #4b4b4b;
       width: 100%;
+      transition: all .2s;
       .date {
         display: flex;
         display: -webkit-flex;
@@ -510,7 +513,7 @@
       }
     }
     .lists {
-      position: absolute;
+      position: relative;
       z-index: 15;
       background: #fff;
       width: 100%;
@@ -518,7 +521,6 @@
       display: -webkit-flex;
       flex-flow: row nowrap;
       top: 1.6rem;
-      margin-bottom: 2rem;
       .time {
         width: 1rem;
         height: 100%;
