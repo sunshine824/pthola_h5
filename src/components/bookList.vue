@@ -1,5 +1,5 @@
 <template>
-  <div class="book clearfix">
+  <div class="book clearfix" :style="{height:screenHeight+'px'}">
     <calendar
       ref="calendar"
       @clickTap="clickTap"
@@ -104,6 +104,7 @@
         coachData: {},
         isShare: false,
         isLoading: false,
+        screenHeight: document.documentElement.clientHeight
       }
     },
     created() {
@@ -371,10 +372,10 @@
     display: flex;
     display: -webkit-flex;
     flex-flow: column nowrap;
+    overflow: hidden;
     .user-info {
       height: 2rem;
       width: 100%;
-      position: fixed;
       background: #4b4b4b;
       z-index: 100;
       display: flex;
@@ -384,8 +385,6 @@
       padding: 0 .3rem;
       box-sizing: border-box;
       align-items: center;
-      bottom: 0;
-      transition: all .2s;
       .avatar-info {
         display: flex;
         display: -webkit-flex;

@@ -13,52 +13,53 @@
         </div>
       </div>
     </div>
-    <div class="lists" :style="{height: sizeRem * time + 2 + 'rem'}">
-      <!--左侧时间段-->
-      <div class="time" :style="{height: sizeRem * time + 'rem'}">
-        <div class="tip" :ref="index===10 ? 'ten' : ''" v-for="(item,index) in time">
-          <p class="tim">
-            <span class="num">{{String(index).length > 1 ? String(index) : 0+String(index)}}</span>
+    <div class="lists">
+      <div class="list-main" :style="{height: sizeRem * time + 'rem'}">
+        <!--左侧时间段-->
+        <div class="time">
+          <div class="tip" :ref="index===10 ? 'ten' : ''" v-for="(item,index) in time">
+            <p class="tim">
+              <span class="num">{{String(index).length > 1 ? String(index) : 0+String(index)}}</span>
+              <span class="txt">:00</span>
+            </p>
+          </div>
+          <p class="last-time">
+            <span class="num">24</span>
             <span class="txt">:00</span>
           </p>
         </div>
-        <p class="last-time">
-          <span class="num">24</span>
-          <span class="txt">:00</span>
-        </p>
+        <!--右侧排课列表-->
+        <div class="calendar" @click="onTap($event)">
+          <!--<p class="six-bar" :style="barStyle.sixBar"></p>-->
+          <!--<p class="zero-bar" :style="barStyle.zeroBar"></p>-->
+          <p class="ver-line"
+             v-for="(item,index) in verLine"
+             :style="{left:sizeRem * index + 'rem'}">
+          </p>
+          <p class="cross-line"
+             ref="crossLines"
+             v-for="(item,index) in crossLine"
+             :style="{top:sizeRem * index + 'rem'}">
+          </p>
+          <transition-group name="btn-scale">
+            <p class="btn" v-for="(item,index) in offset.queryData" :key="index"
+               :style="{left:item.left,top:item.top}">{{item.type===1 ? '我的课' : '已约'}}</p>
+          </transition-group>
+          <transition-group name="btn-scale">
+            <p class="btn" @click="editCourse(index)" v-for="(item,index) in offset.reservation" :key="index"
+               style="background: #f1824a"
+               :style="{left:item.left,top:item.top}">我的<br>预约</p>
+          </transition-group>
+          <transition-group name="btn-scale">
+            <p class="btn" v-for="(item,index) in offset.occupation" :key="index"
+               :class="item.type ===1 ? 'gray' : ''"
+               :style="{left:item.left,top:item.top}">{{item.type===1 ? '休息' : '已约'}}</p>
+          </transition-group>
+          <transition name="btn-scale">
+            <p class="btn-op btn" v-if="opBtn.left" :style="{left:opBtn.left,top:opBtn.top}"></p>
+          </transition>
+        </div>
       </div>
-      <!--右侧排课列表-->
-      <div class="calendar" :style="{height: sizeRem * time + 'rem'}" @click="onTap($event)">
-        <!--<p class="six-bar" :style="barStyle.sixBar"></p>-->
-        <!--<p class="zero-bar" :style="barStyle.zeroBar"></p>-->
-        <p class="ver-line"
-           v-for="(item,index) in verLine"
-           :style="{left:sizeRem * index + 'rem'}">
-        </p>
-        <p class="cross-line"
-           ref="crossLines"
-           v-for="(item,index) in crossLine"
-           :style="{top:sizeRem * index + 'rem'}">
-        </p>
-        <transition-group name="btn-scale">
-          <p class="btn" v-for="(item,index) in offset.queryData" :key="index"
-             :style="{left:item.left,top:item.top}">{{item.type===1 ? '我的课' : '已约'}}</p>
-        </transition-group>
-        <transition-group name="btn-scale">
-          <p class="btn" @click="editCourse(index)" v-for="(item,index) in offset.reservation" :key="index"
-             style="background: #f1824a"
-             :style="{left:item.left,top:item.top}">我的<br>预约</p>
-        </transition-group>
-        <transition-group name="btn-scale">
-          <p class="btn" v-for="(item,index) in offset.occupation" :key="index"
-             :class="item.type ===1 ? 'gray' : ''"
-             :style="{left:item.left,top:item.top}">{{item.type===1 ? '休息' : '已约'}}</p>
-        </transition-group>
-        <transition name="btn-scale">
-          <p class="btn-op btn" v-if="opBtn.left" :style="{left:opBtn.left,top:opBtn.top}"></p>
-        </transition>
-      </div>
-      <!--<div class="space-box"></div>-->
     </div>
     <transition name="model-scale">
       <div class="model" v-if="isFade">
@@ -198,10 +199,8 @@
           const start = (String(Math.floor(y - 1)).length > 1 ? String(Math.floor(y - 1)) : 0 + String(Math.floor(y - 1))) + ':30'
           const end = (String(Math.floor(y)).length > 1 ? String(Math.floor(y)) : 0 + String(Math.floor(y))) + ':30'
           const date = that.calendarDate[x - 1].date
-
           //是否冲突
           if (that._isClash(x, y)) return
-
           this.params = {
             date: date,
             time: start + '-' + end,
@@ -226,7 +225,6 @@
           const end = (String(y).length > 1 ? String(y) : 0 + String(y)) + ':00'
           const date = that.calendarDate[x - 1].date
           if (that._isClash(x, y)) return
-
           this.params = {
             date: date,
             time: start + '-' + end,
@@ -273,7 +271,6 @@
       //判断是否点击中间部分
       _isClickCenter(offsetY) {
         let [that, isCenter, index] = [this, false, 0]
-
         for (let i = 0; i < that.crossLines.length; i++) {
           let height1 = that.crossLines[i]
           let height2 = that.crossLines[i + 1]
@@ -365,22 +362,18 @@
       _initOffset(arr) {
         let [_this] = [this]
         _this.bookList = []
-
         let promise1 = new Promise((resolve, reject) => {
           _this._promise(arr, 'reservation')
           resolve(_this.reservation)
         })
-
         let promise2 = new Promise((resolve, reject) => {
           _this._promise(arr, 'occupation')
           resolve(_this.occupation)
         })
-
         let promise3 = new Promise((resolve, reject) => {
           _this._promise(arr, 'queryData')
           resolve(_this.queryData)
         })
-
         Promise.all([promise1, promise2, promise3]).then(res => {
           _this.offset = {
             reservation: res[0],
@@ -455,18 +448,16 @@
     width: 100%;
     flex-flow: column nowrap;
     position: relative;
+    flex: 1;
     .top-list {
       display: flex;
       display: -webkit-flex;
       flex-flow: row nowrap;
       align-items: center;
       height: 1.6rem;
-      position: fixed;
       z-index: 20;
-      top: 0;
       background: #4b4b4b;
       width: 100%;
-      transition: all .2s;
       .date {
         display: flex;
         display: -webkit-flex;
@@ -513,14 +504,16 @@
       }
     }
     .lists {
-      position: relative;
-      z-index: 15;
-      background: #fff;
       width: 100%;
-      display: flex;
-      display: -webkit-flex;
-      flex-flow: row nowrap;
-      top: 1.6rem;
+      flex: 1;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling : touch;
+      .list-main{
+        background: #fff;
+        display: flex;
+        display: -webkit-flex;
+        flex-flow: row nowrap;
+      }
       .time {
         width: 1rem;
         height: 100%;
