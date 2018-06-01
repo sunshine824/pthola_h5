@@ -162,6 +162,7 @@
       },
       //绑定手机号
       bindPhone() {
+        this.isLoading = true
         if (!this._verifyPhone()) return
         if (!this._verifyCode()) return
 
