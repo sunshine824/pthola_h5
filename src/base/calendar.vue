@@ -42,7 +42,7 @@
              :style="{top:sizeRem * index + 'rem'}">
           </p>
           <transition-group name="btn-scale">
-            <p class="btn" v-for="(item,index) in offset.queryData" :key="index"
+            <p class="btn" v-for="(item,index) in offset.arranging" :key="index"
                :style="{left:item.left,top:item.top}">{{item.type===1 ? '我的课' : '已约'}}</p>
           </transition-group>
           <transition-group name="btn-scale">
@@ -122,7 +122,7 @@
     created() {
       this.reservation = []
       this.occupation = []
-      this.queryData = []
+      this.arranging = []
       this.bookList = []
       this.getCalendarDate()
     },
@@ -371,14 +371,14 @@
           resolve(_this.occupation)
         })
         let promise3 = new Promise((resolve, reject) => {
-          _this._promise(arr, 'queryData')
-          resolve(_this.queryData)
+          _this._promise(arr, 'arranging')
+          resolve(_this.arranging)
         })
         Promise.all([promise1, promise2, promise3]).then(res => {
           _this.offset = {
             reservation: res[0],
             occupation: res[1],
-            queryData: res[2]
+            arranging: res[2]
           }
           _this.bookList.push(...res[0], ...res[1], ...res[2])
         })

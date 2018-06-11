@@ -267,8 +267,8 @@
         })
         result.then(res => {
           if (!this.coachData.coach_name) {
-            this.coachData = res.coachData
-            document.title = '学员约课-' + res.coachData.coach_name + '课表'
+            this.coachData = res.coach_data
+            document.title = '学员约课-' + res.coach_data.coach_name + '课表'
           }
           this.isLoading = false
           this.$refs.calendar._initOffset(res)
@@ -284,8 +284,8 @@
         })
         result.then(res => {
           if (!this.coachData.coach_name) {
-            this.coachData = res.coachData
-            document.title = '学员约课-' + res.coachData.coach_name + '课表'
+            this.coachData = res.coach_data
+            document.title = '学员约课-' + res.coach_data.coach_name + '课表'
           }
           this.isLoading = false
           this.$refs.calendar._initOffset(res)
