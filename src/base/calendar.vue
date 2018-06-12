@@ -188,12 +188,14 @@
         if (e.target.className !== 'calendar') return
         let [that, offsetX, offsetY, sizePx] = [this, e.offsetX, e.offsetY, this.sizePx]
         const centerObj = that._isClickCenter(offsetY)
+
         //派发点击事件
         this.$emit('clickTap')
         //未绑定手机号
         if (!sessionStorage.getItem('token')) return
         //判断是否点击中间部分
         if (centerObj.isCenter) {
+          console.log(1)
           const y = centerObj.index + 0.5
           const x = Math.ceil(offsetX / sizePx)
           const start = (String(Math.floor(y - 1)).length > 1 ? String(Math.floor(y - 1)) : 0 + String(Math.floor(y - 1))) + ':30'
@@ -219,6 +221,7 @@
             that.toggleFade()
           }, 100)
         } else {
+          console.log(2)
           const y = Math.ceil(offsetY / sizePx)
           const x = Math.ceil(offsetX / sizePx)
           const start = (String(y - 1).length > 1 ? String(y - 1) : 0 + String(y - 1)) + ':00'
