@@ -14,7 +14,7 @@ export default new Router({
       component: wxLogin
     },
     {
-      path: '/index',
+      path: '/home',
       name: 'bookList',
       component: bookList
     }

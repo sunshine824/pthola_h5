@@ -109,10 +109,11 @@
     },
     created() {
       sessionStorage.removeItem('openid')
-      let coach_id = this.$route.query.from_key
-      if (coach_id) {
-        sessionStorage.setItem('coach_id', coach_id)
-      }
+      this.form_key = this.$route.query.form_key
+      // let coach_id = this.$route.query.form_key
+      // if (coach_id) {
+      //   sessionStorage.setItem('coach_id', coach_id)
+      // }
       this.wxLoginVerify()
     },
     methods: {
@@ -142,8 +143,10 @@
           this._wxStudentLogin({wechatcode: code})
           return
         } else {
+          let callback = encodeURIComponent(window.location.href)
           this.$router.push({
-            path: '/'
+            path: '/',
+            query:{callback:callback}
           })
         }
       },
@@ -182,9 +185,14 @@
         }).catch(err => {
           let errInfo = err.response.data
           if (errInfo.code === 10118) {
-            this.$router.push({
-              path: '/'
-            })
+            // this.$router.push({
+            //   path: '/'
+            // })
+            this.$createDialog({
+              type: 'alert',
+              title: '授权码无效',
+              icon: 'cubeic-alert',
+            }).show()
           } else if (errInfo.code === 10106) {
             sessionStorage.setItem('openid', errInfo.datum.wechat_openid)
             this._getYetBookList()
@@ -211,7 +219,7 @@
       _addCourse(data) {
         const that = this
         const result = addCourse({
-          coach_id: sessionStorage.getItem('coach_id'),
+          coach_id: that.form_key,
           start_time: data.start_time,
           end_time: data.end_time,
         })
@@ -238,7 +246,7 @@
         const that = this
         const result = editCourse({
           id: data.id,
-          coach_id: sessionStorage.getItem('coach_id'),
+          coach_id: that.form_key,
           start_time: data.start_time,
           end_time: data.end_time,
         })
@@ -263,7 +271,7 @@
       //预约列表
       _getBookList() {
         const result = getBookList({
-          coach_id: sessionStorage.getItem('coach_id')
+          coach_id: this.form_key
         })
         result.then(res => {
           if (!this.coachData.coach_name) {
@@ -280,7 +288,7 @@
       //获取已同意约课（包括休息占位）
       _getYetBookList() {
         const result = getYetBookList({
-          coach_id: sessionStorage.getItem('coach_id')
+          coach_id: this.form_key
         })
         result.then(res => {
           if (!this.coachData.coach_name) {
