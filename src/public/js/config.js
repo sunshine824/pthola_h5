@@ -1,4 +1,5 @@
-﻿export const serveUrl = 'https://api-test.pthola.com'
+﻿//export const serveUrl = 'https://api-test.pthola.com'
+export const serveUrl = 'https://api.pthola.com'
 //export const serveUrl = 'http://192.168.31.66'
 export const ERR = {
   '10404':{
