@@ -71,3 +71,13 @@ export function editCourse(params) {
   const result = post('api/2.0.0/edit.about', params)
   return result
 }
+
+/**
+ * 微信分享
+ * @param params
+ * @returns {*}
+ */
+export function wxShare(params) {
+  const result = post('api/2.0.0/wechat.config',params)
+  return result
+}

@@ -73,7 +73,8 @@
     editCourse,
     wxStudentLogin,
     sendVerifyCode,
-    getYetBookList
+    getYetBookList,
+    wxShare
   } from '@/public/js/api'
 
   export default {
@@ -146,7 +147,7 @@
           let callback = encodeURIComponent(window.location.href)
           this.$router.push({
             path: '/',
-            query:{callback:callback}
+            query: {callback: callback}
           })
         }
       },
@@ -185,14 +186,11 @@
         }).catch(err => {
           let errInfo = err.response.data
           if (errInfo.code === 10118) {
-            // this.$router.push({
-            //   path: '/'
-            // })
-            this.$createDialog({
-              type: 'alert',
-              title: '授权码无效',
-              icon: 'cubeic-alert',
-            }).show()
+            let callback = encodeURIComponent(window.location.href)
+            this.$router.push({
+              path: '/',
+              query: {callback: callback}
+            })
           } else if (errInfo.code === 10106) {
             sessionStorage.setItem('openid', errInfo.datum.wechat_openid)
             this._getYetBookList()
@@ -278,6 +276,7 @@
             this.coachData = res.coach_data
             document.title = '学员约课-' + res.coach_data.coach_name + '课表'
           }
+          this.wxShare()
           this.isLoading = false
           this.$refs.calendar._initOffset(res)
         }).catch(err => {
@@ -295,6 +294,7 @@
             this.coachData = res.coach_data
             document.title = '学员约课-' + res.coach_data.coach_name + '的课表'
           }
+          this.wxShare()
           this.isLoading = false
           this.$refs.calendar._initOffset(res)
         }).catch(err => {
@@ -362,6 +362,42 @@
         } else {
           return true
         }
+      },
+      //微信分享
+      wxShare() {
+        const link = window.location.href.split('#')[0] + '?after=123#' + window.location.href.split('#')[1]
+        const that = this
+        const result = wxShare({
+          url: window.location.href
+        })
+        result.then(res => {
+          //权限验证配置
+          wx.config({
+            debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            appId: res.AppId, // 必填，公众号的唯一标识
+            timestamp: res.Timestamp, // 必填，生成签名的时间戳
+            nonceStr: res.NonceStr, // 必填，生成签名的随机串
+            signature: res.Signature,// 必填，签名
+            jsApiList: ['onMenuShareAppMessage', 'onMenuShareTimeline'] // 必填，需要使用的JS接口列表
+          });
+          //分享到朋友圈
+          wx.onMenuShareTimeline({
+            title: '立即预约我的私教课-' + that.coachData.coach_name + '的课表', // 分享标题
+            link: link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+            imgUrl: that.coachData.headimgurl, // 分享图标
+          });
+          //分享给朋友
+          wx.onMenuShareAppMessage({
+            title: '立即预约我的私教课-' + that.coachData.coach_name + '的课表', // 分享标题
+            desc: '教练' + that.coachData.coach_name + '未来七天的课表，速来预约先到先得！', // 分享描述
+            link: link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+            imgUrl: that.coachData.headimgurl, // 分享图标
+            type: '', // 分享类型,music、video或link，不填默认为link
+            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+          })
+        }).catch(err => {
+          console.log(err.response)
+        })
       }
     }
   }
