@@ -18,7 +18,6 @@
       //微信授权登录获取code
       _getWeChatCode() {
         const result = getWeChatCode(this.$route.query.callback)
-        console.log(result)
         window.location.href = result
       }
     }

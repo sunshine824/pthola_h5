@@ -18,7 +18,7 @@ export function getWeChatCode(url) {
  * @returns {*}
  */
 export function wxStudentLogin(params) {
-  const result = post('/api/2.0.0/student.web.login', params)
+  const result = post('api/2.0.0/student.web.login', params)
   return result
 }
 

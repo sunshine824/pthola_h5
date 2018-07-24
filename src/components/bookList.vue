@@ -141,7 +141,7 @@
           return
         } else if (!token && code) {
           //获取token判断是否绑定手机号
-          this._wxStudentLogin({wechatcode: code})
+          this._wxStudentLogin({code: code})
           return
         } else {
           let callback = encodeURIComponent(window.location.href)
@@ -173,7 +173,7 @@
         this._wxStudentLogin({
           phone: this.phone.value,
           verification: this.verification.value,
-          wechatopenid: sessionStorage.getItem('openid')
+          openid: sessionStorage.getItem('openid')
         })
       },
       //获取token判断是否绑定手机号
@@ -192,8 +192,27 @@
               query: {callback: callback}
             })
           } else if (errInfo.code === 10106) {
-            sessionStorage.setItem('openid', errInfo.datum.wechat_openid)
+            sessionStorage.setItem('openid', errInfo.datum.openid)
             this._getYetBookList()
+          } else if (errInfo.code === 10116) {
+            this.$createDialog({
+              type: 'confirm',
+              icon: 'cubeic-alert',
+              title: errInfo.message,
+              content: '您的手机号已绑定微信：' + errInfo.datum['nickname'] + ' , 是否进行强制性绑定？',
+              showClose: true,
+              onConfirm: () => {
+                this._wxStudentLogin({
+                  phone: this.phone.value,
+                  verification: this.verification.value,
+                  openid: sessionStorage.getItem('openid'),
+                  force: true
+                })
+              },
+              onCancel: () => {
+                this.isLoading = false
+              }
+            }).show()
           } else {
             this.isLoading = false
             this.$createDialog({
