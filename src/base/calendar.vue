@@ -42,16 +42,16 @@
              :style="{top:sizeRem * index + 'rem'}">
           </p>
           <transition-group name="btn-scale">
-            <p class="btn" v-for="(item,index) in offset.arranging" :key="index"
+            <p class="btn" v-for="(item,index) in offset.arranging" :key="item"
                :style="{left:item.left,top:item.top}">{{item.type===1 ? '我的课' : '已约'}}</p>
           </transition-group>
           <transition-group name="btn-scale">
-            <p class="btn" @click="editCourse(index)" v-for="(item,index) in offset.reservation" :key="index"
+            <p class="btn" @click="editCourse(index)" v-for="(item,index) in offset.reservation" :key="item"
                style="background: #f1824a"
                :style="{left:item.left,top:item.top}">我的<br>预约</p>
           </transition-group>
           <transition-group name="btn-scale">
-            <p class="btn" v-for="(item,index) in offset.occupation" :key="index"
+            <p class="btn" v-for="(item,index) in offset.occupation" :key="item"
                :class="item.type ===1 ? 'gray' : ''"
                :style="{left:item.left,top:item.top}">{{item.type===1 ? '休息' : '已约'}}</p>
           </transition-group>
@@ -456,7 +456,7 @@
       flex-flow: row nowrap;
       align-items: center;
       height: 1.6rem;
-      z-index: 20;
+      z-index: 2;
       background: #4b4b4b;
       width: 100%;
       .date {

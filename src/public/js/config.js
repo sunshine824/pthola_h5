@@ -1,6 +1,6 @@
 ﻿//export const serveUrl = 'https://api-test.pthola.com'
 export const serveUrl = 'https://api.pthola.com'
-//export const serveUrl = 'http://192.168.31.94:8000'
+//export const serveUrl = 'http://192.168.0.103:8088'
 export const ERR = {
   '10404':{
     content:'该教练本时段已被预约，请修改时间。'
